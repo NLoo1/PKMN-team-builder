@@ -1,0 +1,84 @@
+import React from "react";
+import { NavLink } from "react-router-dom";
+import { Navbar, Nav, NavItem } from "reactstrap";
+import "./NavBar.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import pokeballImage from './pokeball.png';
+ 
+/**
+ * NavBar
+ * 
+ * Navigation bar that persists between routes. Conditionally shows links depending on route
+ */
+function NavBar({currentUser, logout}) {
+
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+
+    // Maybe change this later
+    navigate('/');
+  };
+
+  return (
+    <div>
+      {/* Brand name */}
+      <Navbar expand="md">
+        <NavLink exact to="/" className="navbar-brand">
+          <img src={pokeballImage} alt="Pokemon" className="logo"/>
+        </NavLink>
+
+        {/* Nav stuff */}
+        <Nav className="ml-auto navbar-nav" navbar>
+
+          {/* Login 
+          Hide if user is logged in*/}
+          {location.pathname !== "/login" && currentUser == null && (
+            <NavItem>
+              <NavLink to="/login" className="nav-link">
+                Login
+              </NavLink>
+            </NavItem>
+          )}
+
+
+
+          {/* Signup 
+            Hide this if a user is logged in.
+          */}
+          {location.pathname !== "/signup" && currentUser==null && (
+            <NavItem>
+              <NavLink to='/signup' className="nav-link">
+                Sign up
+              </NavLink>
+            </NavItem>
+          )}
+
+          {/* Logout */}
+          {location.pathname !== "/logout" && currentUser && (
+            <NavItem>
+              <span onClick={handleLogout} className="nav-link" style={{ cursor: 'pointer' }}>
+              Logout
+              </span>
+            </NavItem>
+          )}
+          
+          {/* Profile */}
+          {location.pathname !== "/profile" && currentUser && (
+            <NavItem>
+              <NavLink to='/profile' className="nav-link" >
+              Profile
+              </NavLink>
+            </NavItem>
+          )}
+
+        </Nav>
+      </Navbar>
+    </div>
+  );
+}
+
+export default NavBar;
