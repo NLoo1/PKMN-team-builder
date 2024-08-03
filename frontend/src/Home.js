@@ -2,6 +2,11 @@ import React from "react";
 import 'reactstrap'
 import { Card, CardBody, CardTitle } from "reactstrap";
 
+
+/**
+ * Home 
+ * The basic Home page component.
+ */
 export default function Home() {
 
   return (

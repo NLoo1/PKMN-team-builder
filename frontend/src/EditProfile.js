@@ -3,12 +3,18 @@ import { Card, CardBody, CardTitle } from "reactstrap";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import PokeAPI from "./api";
-
 import { useNavigate } from "react-router-dom";
 
-const EditUser = ({ editUser, currentUser,token}) => {
 
+/**
+ * EditUser
+ * Form for editing a user. Only the user or an admin should be able to access
+ */
+const EditUser = ({ editUser ,token}) => {
+
+  // Route is under /users/:username/edit, so username can be fetched here
   const params = useParams()
+
   const [isLoaded, setIsLoaded] = useState(false)
   const [userData, setUserData] = useState(null)
 
@@ -16,7 +22,12 @@ const EditUser = ({ editUser, currentUser,token}) => {
 
   useEffect( () => {
         async function getProfile(){
-            const resp = await PokeAPI.getUser(currentUser, token)
+            console.log(params.username)
+            if((params.username !== localStorage.user) && localStorage.isAdmin == 'false'){
+              alert("Cannot edit another user's profile.")
+              navigate('/')
+            }
+            const resp = await PokeAPI.getUser(params.username, token)
             setUserData(resp)
         }
         getProfile()
@@ -58,15 +69,14 @@ const EditUser = ({ editUser, currentUser,token}) => {
     }
   
     try {
-      // console.log(params)
       await editUser(formData, params.username);
       setFormData(INITIAL_STATE); // Clear form after successful submission
       alert(`Successfully changed profile for ${params.username}`)
-      // window.location.href = '/'
       navigate('/')
       
     } catch (error) {
       console.error("Error editing user:", error);
+      
       // Handle error appropriately (e.g., show error message)
       alert("Failed to edit user");
     }

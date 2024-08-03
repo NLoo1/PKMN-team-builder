@@ -1,0 +1,9 @@
+.content{
+    width: 80vw;
+    align-self: center;
+}
+
+.page{
+    display: flex;
+    flex-direction: column;
+}

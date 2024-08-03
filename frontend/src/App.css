@@ -1,11 +1,33 @@
+
 main {
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
   padding-top: 15vh;
   height: calc(100vh - 56px); /* router view - navbar height */
   background-color: skyblue;
 }
 
+.card {
+  padding: 20px;
+}
+
+footer{
+  background-color: black;
+  position: fixed;
+  width: 100vw;
+  bottom: 0%;
+  display: flex;
+}
+
+footer a{
+  color: white;
+  margin-right: 4px;
+}
+
+footer p{
+  color: white;
+}

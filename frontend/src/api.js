@@ -1,6 +1,9 @@
+
+import Pokedex from 'pokedex-promise-v2';
 import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:3001";
+const P = new Pokedex();
 
 /** API Class.
  *
@@ -77,10 +80,31 @@ class PokeAPI {
     return res.company;
   }
 
-  static async deleteUser(id) {
-    let res = await this.request(`users/${id}`, {}, 'delete');
+  static async deleteUser(id, token) {
+    let res = await this.request(`users/${id}`, {}, 'delete', token);
     return res;
   }
+
+
+
+// POKEMON
+
+static async getAllPokemon(){
+  const interval = {
+    limit: 10,
+    offset: 34
+  }
+  const resp = await P.getPokemonsList(interval)
+  return resp
+}
+
+static async getPokemonSpriteByURL(url){
+  const resp = await axios.get(url)
+  return resp.data.sprites.front_default
+}
+
+static async getPokemonFromSearch(search){
+}
 }
 // For now, put token ("testuser" / "password" on class)
 PokeAPI.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZ" +

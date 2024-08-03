@@ -7,6 +7,8 @@ import PokeAPI from "./api.js";
 import LoginUser from "./LoginForm.js";
 import SignupUser from "./Signup.js";
 import { Profile } from "./Profile.js";
+import Page from "./Page.js";
+import EditUser from "./EditProfile.js";
 
 /**
  * App
@@ -19,11 +21,11 @@ function App() {
   const [token, setToken] = useState(localStorage.token || null);
 
 
-/**
- * addUser
- * Passed to signup form and takes form data. Registers a new user and sets local storage to said user and corresponding token
- * @param {*} user The form data from Signup.js
- */
+  /**
+   * addUser
+   * Passed to signup form and takes form data. Registers a new user and sets local storage to said user and corresponding token
+   * @param {*} user The form data from Signup.js
+   */
   async function addUser(user) {
     try {
 
@@ -60,10 +62,8 @@ function App() {
   async function login({ username, password }) {
     try {
       const resp = await PokeAPI.login(username, password);
-      console.log(resp)
       setToken(resp.token);
       setCurrentUser(username);
-      console.log("Successfully logged in!");
       localStorage.user = username
       localStorage.token = resp.token
       localStorage.isAdmin = resp.isAdmin
@@ -79,20 +79,36 @@ function App() {
   async function logout() {
     setCurrentUser(null);
     setToken(null);
-    // JoblyApi.token = null
+    PokeAPI.token = null
     localStorage.clear()
   }
 
-  async function editUser(user, username){
-    try{
-        // const resp = await JoblyApi.patchUser({
-        // firstName: user.firstname, 
-        //  lastName: user.lastname,
-          // email: user.email}, username, localStorage.token)
 
-      // console.log(`Successfully edited ${resp.username}!`);
+  // Edit user. Admin or same user only
+  async function editUser(user, username) {
+    try {
+      const resp = await PokeAPI.patchUser({
+        username: user.username,
+        email: user.email
+      }, username, localStorage.token)
 
-    } catch(e){
+      console.log(`Successfully edited ${resp.username}!`);
+
+    } catch (e) {
+      console.error(`Failed to edit user: ${e}`)
+    }
+
+  }
+  
+  // Delete user. Only an admin should be able to use this
+  async function deleteUser(username) {
+    try {
+      const resp = await PokeAPI.deleteUser({
+        username: username}, localStorage.token)
+      console.log(`Successfully deleted ${resp.username}!`);
+
+    } catch (e) {
+      console.error(`Failed to delete user: ${e}`)
     }
 
   }
@@ -100,40 +116,52 @@ function App() {
   return (
     <div className="app">
       <BrowserRouter>
-
         <NavBar currentUser={currentUser} logout={logout} />
         <main>
           <Routes>
 
-            <Route exact path="/" element={<Home />}/>
+            <Route exact path="/" element={<Home />} />
 
-            {localStorage.isAdmin && 
-            <Route exact path="/users"/>
+            {/* If a user is an admin, show the hidden Users route */}
+            {localStorage.isAdmin=='true' &&
+              <Route exact path="/users" />
             }
             {/* IF the user isn't logged in, show the login and signup routes. */}
             {currentUser == null ? (
               <Fragment>
                 <Route exact path="/login" element={<LoginUser login={login} />} />
-                <Route exact path="/signup" element={<SignupUser addUser={addUser} />}/>
+                <Route exact path="/signup" element={<SignupUser addUser={addUser} />} />
+
               </Fragment>
             ) : (
 
               // If the user IS logged in, show profile and the ability to logout
               <Fragment>
-                <Route exact path="/profile" element={<Profile currentUser={currentUser} token={token} />}/>
-                <Route exact path="/logout" element={<Navigate to="/"/>} />
+                <Route exact path="/profile" element={<Profile currentUser={currentUser} token={token} editUser={editUser} deleteUser={deleteUser} />} />
+                <Route exact path="/logout" element={<Navigate to="/" />} />
 
+                {/* Allows a user to see profiles of other users. */}
+                <Route exact path='/users/:username' element={<Profile currentUser={currentUser} token={token} editUser={editUser} deleteUser={deleteUser}  />} />
+
+                
+                {/* Allow a user to edit their profile. Can also be changed by an admin. */}
+                <Route exact path='/users/:username/edit' element={<EditUser currentUser={currentUser} token={token} editUser={editUser} />} />
               </Fragment>
             )}
 
-
-            <Route exact path="/users/:username"/>
+            
+            <Route exact path='/pokemon' element={<Page />} />
+            <Route exact path='/pokemon/:id' />
 
             {/* For admin accounts. Shows list of users */}
-            {localStorage.isAdmin == 'true' && 
-            <Route exact path="/users" />
-            
+            {localStorage.isAdmin == 'true' &&
+              <Fragment>
+                <Route exact path="/users" element={<Page type='users' />} />
+              </Fragment>
+
             }
+
+<Route exact path="/users/:username" ele/>
 
             {/* Modify a user's profile */}
             <Route path='/users/:username/edit' />
@@ -141,8 +169,16 @@ function App() {
             {/* If route not found navigate to root */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
+          <footer>
+          <p>Pokemon icons created by Nikita Golubev - <a href="https://www.flaticon.com/free-icons/pokemon" title="pokemon icons" id="credit">Flaticon</a>.</p>
+          <p>All Pokemon data is sourced directly from the free open-source Pokemon database API, <a href='https://pokeapi.co/'>PokeAPI</a>.</p>
+          </footer>
+
         </main>
+
       </BrowserRouter>
+
+
     </div>
   );
 }

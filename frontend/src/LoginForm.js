@@ -2,6 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CardBody, Card, CardTitle } from "reactstrap";
 
+
+/**
+ * Login
+ * Form component for users to login. 
+ * Upon successful login, users will be navigated back to the homepage.
+ * 
+ * @param {function} login Passed from app. Data from this form is passed to login() 
+ */
 const LoginUser = ({ login }) => {
   const INITIAL_STATE = {
     username: '',
@@ -10,6 +18,12 @@ const LoginUser = ({ login }) => {
   const [formData, setFormData] = useState(INITIAL_STATE);
   const navigate = useNavigate();
 
+
+  /**
+   * handleChange
+   * Form data will constantly be updated based on user input.
+   * This is important to pass the right data to login
+   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(formData => ({
@@ -18,6 +32,11 @@ const LoginUser = ({ login }) => {
     }))
   }
 
+
+  /**
+   * handleSubmit
+   * Handles form submission. Will alert user if login failed
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if(formData.username.trim() !== '' && formData.password.trim() !== '' ) {
@@ -34,6 +53,8 @@ const LoginUser = ({ login }) => {
       <CardBody>
         <CardTitle><h1>Log in here:</h1></CardTitle>
         <form onSubmit={handleSubmit}>
+
+          {/* Username login */}
           <div className="form-group p-2">
             <label htmlFor="username">Username: </label>
             <input
@@ -46,6 +67,8 @@ const LoginUser = ({ login }) => {
                 className='form-control'
             />
           </div>
+
+          {/* Password here */}
           <div className="form-group p-2">
             <label htmlFor="password">Password: </label>
             <input
@@ -58,6 +81,8 @@ const LoginUser = ({ login }) => {
                 className='form-control'
             />
           </div>
+
+          {/* Click here to submit the form */}
           <button type='submit' className='btn btn-primary p-2'>Log in</button>
         </form>
       </CardBody>
