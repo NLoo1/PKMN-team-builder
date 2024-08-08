@@ -7,6 +7,7 @@ import PokeAPI from "./api.js";
 import LoginUser from "./LoginForm.js";
 import SignupUser from "./Signup.js";
 import { Profile } from "./Profile.js";
+import DeleteUser from "./DeleteUser.js";
 import Page from "./Page.js";
 import EditUser from "./EditProfile.js";
 
@@ -146,6 +147,7 @@ function App() {
                 
                 {/* Allow a user to edit their profile. Can also be changed by an admin. */}
                 <Route exact path='/users/:username/edit' element={<EditUser currentUser={currentUser} token={token} editUser={editUser} />} />
+                <Route exact path='/users/:username/delete' element={<DeleteUser currentUser={currentUser} token={token} deleteUser={deleteUser} />} />
               </Fragment>
             )}
 
@@ -170,8 +172,8 @@ function App() {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
           <footer>
-          <p>Pokemon icons created by Nikita Golubev - <a href="https://www.flaticon.com/free-icons/pokemon" title="pokemon icons" id="credit">Flaticon</a>.</p>
-          <p>All Pokemon data is sourced directly from the free open-source Pokemon database API, <a href='https://pokeapi.co/'>PokeAPI</a>.</p>
+          <p>Pokemon icons created by Nikita Golubev - <a href="https://www.flaticon.com/free-icons/pokemon" title="pokemon icons" id="credit">Flaticon.</a></p>
+          <p>All Pokemon data is sourced directly from the free open-source Pokemon database API, <a href='https://pokeapi.co/'>PokeAPI.</a></p>
           </footer>
 
         </main>

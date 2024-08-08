@@ -10,7 +10,7 @@ import axios from "axios";
  * Used for /companies, /jobs, and /users. This is the table.
  * Data fetched is dependent on the location.
  */
-export function List({ type }) {
+export function List({ type, columns = 10}) {
 
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
@@ -53,35 +53,39 @@ export function List({ type }) {
     return <p>Loading &hellip;</p>;
   }
 
-  // The actual content to return
+  // Split data into chunks for each column
+  const chunkSize = Math.ceil(data.length / columns);
+  const dataChunks = [];
+  for (let i = 0; i < columns; i++) {
+    dataChunks.push(data.slice(i * chunkSize, (i + 1) * chunkSize));
+  }
+
   return (
-    <section class='content'>
-      {/* Search bar. Items, location, and data are passed to redirect to appropriate route */}
+    <section className='content'>
       <Search getItems={getItems} location={location} setData={setData} />
 
-      <table className="table table-responsive table-striped">
-        <thead>
+      <div style={{ display: 'flex' }}>
+        {dataChunks.map((chunk, index) => (
+          <table key={index} className="table table-responsive table-striped">
+            <thead>
+              {type === "users" && (
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                </tr>
+              )}
+              {/* {type === "pokemon" && ( */}
 
-          {/* If route is /users, show users table */}
-          {type === "users" && (
-            <tr>
-              <th>Username</th>
-              <th>Email</th>
-            </tr>
-          )}
-          {type === "pokemon" && (
-            <tr>
-              <th>Pokemon</th>
-            </tr>
-          )}
-        </thead>
-        <tbody>
-          {/* Each row in a List is considered an Item */}
-          {data.map((d) => (
-            <Item key={d.id} data={d} type={type}/>
-          ))}
-        </tbody>
-      </table>
+              {/* // )} */}
+            </thead>
+            <tbody>
+              {chunk.map((d) => (
+                <Item key={d.id} data={d} type={type} />
+              ))}
+            </tbody>
+          </table>
+        ))}
+      </div>
     </section>
   );
 }
@@ -120,8 +124,8 @@ export function Item({ data, type }) {
     case "pokemon":
       return (
         <tr key={data.name}>
-          <td><img src={imageUrl} alt={data.name} /></td>
-          <td>{data.name}</td>
+          <td><img src={imageUrl} alt={data.name} style={{maxWidth: '100px', maxHeight: '100px'}} /></td>
+          <td>{data.name[0].toUpperCase() + data.name.slice(1)}</td>
         </tr>
       );
     default:
@@ -141,7 +145,7 @@ export function Search({ getItems, location, setData }) {
   const [search, setSearch] = useState("");
 
   return (
-    <section>
+    <section className='search'>
       {/* This is the actual search bar */}
       <input
         type="text"
@@ -152,7 +156,7 @@ export function Search({ getItems, location, setData }) {
         }}
       />
       <button
-        className="btn btn-primary"
+        className="btn btn-primary mx-2"
         onClick={() => {
           // If the query is empty, just get all the items again
           if (search == ""){
@@ -176,7 +180,7 @@ export function Search({ getItems, location, setData }) {
                 setData(results)
                 break;
               default:
-                console.log("cant find that shit")
+                console.log("cant find that")
                 break;
             }
           }

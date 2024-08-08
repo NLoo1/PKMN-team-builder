@@ -62,7 +62,6 @@ class PokeAPI {
     return res
   }
 
-  // TODO: add authentication
   static async postUserAdmin({user, token}){
     let res = await this.request(`users/`, {user, token}, 'post');
     return res.user;
@@ -91,8 +90,7 @@ class PokeAPI {
 
 static async getAllPokemon(){
   const interval = {
-    limit: 10,
-    offset: 34
+    limit: 2000
   }
   const resp = await P.getPokemonsList(interval)
   return resp

@@ -2,9 +2,9 @@ import { Card, CardBody, CardTitle } from "reactstrap";
 import PokeAPI from "./api";
 import { useState, useEffect } from "react";
 import EditUser from "./EditProfile";
-import { useLocation, useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
+import {Route, Routes, useLocation, useParams } from "react-router-dom";
 
+import { Link } from "react-router-dom";
 /**
  * Profile
  * Component exclusively for rendering a user's profile.
@@ -52,32 +52,33 @@ export function Profile({currentUser, token, editUser, deleteUser}){
                         yes
                     </CardBody>
 
-                    {/* If logged in user is actual user or admin */}
-                    {(location.pathname.includes('/profile') || localStorage.isAdmin=='true') 
+                    {/* User edits their own profile if routed here via /profile */}
+                    {location.pathname.includes('/profile') 
                     && 
-                        <div className='buttons'>
-                        <button className='btn btn-primary'>Edit user</button>
-                        <button className='btn btn-danger'>Delete user</button>   
-                        </div>
+                        <section>
+                            <Link to={'/users/' + localStorage.user + '/edit'}><button className='btn btn-primary'>Edit user</button></Link>
+                            {localStorage.isAdmin == 'true' &&
+                            <Link to={'/users/' + localStorage.user + '/delete'}><button className='btn btn-danger'>Delete user</button></Link>
+        
+                            }
+                        </section>
                     }
 
 
-                    {/* {location.pathname.includes('/users') && !location.pathname.includes(localStorage.user) &&  */}
-                    {/* <h1>:(</h1>} */}
+                    {/* If routed here through /users, display these for admins only  */}
+                    {location.pathname.includes('/users/' ) &&
+                        <section>
+                            <Link to={'/users/' + params.username + '/edit'}><button className='btn btn-primary'>Edit user</button></Link>
+                            {localStorage.isAdmin == 'true' &&
+                            <Link to={'/users/' + params.username + '/delete'}><button className='btn btn-danger'>Delete user</button></Link>
+                            }
+                        </section>
+                    }
 
-                
-        {/* <button className="btn btn-primary">
-            {location.pathname.includes('/profile') ? 
-        :
-            <Link to={'/users/' + params.username + '/edit'} style={{color:'white'}}>Edit profile</Link>
-        }
-            </button> */}
 
-            {localStorage.isAdmin == true &&
-        <button className="btn btn-danger">Delete user</button>
-            }
+
                 </Card>
-                
+        
                 </section>    
             :
             <section>Loading...</section>

@@ -1,9 +1,18 @@
 .content{
     width: 80vw;
+    height: 100vh;
     align-self: center;
+    overflow-y: scroll;
 }
 
 .page{
     display: flex;
     flex-direction: column;
+}
+
+.search{
+    position: absolute;
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
 }
