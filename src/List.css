@@ -1,0 +1,41 @@
+.content {
+    width: 80vw;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.search {
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.table-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    width: 100%; 
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse; 
+    margin-bottom: 1rem; 
+}
+
+.table th, .table td {
+    border: 1px solid #ddd; 
+    padding: 8px;
+    text-align: left;
+}
+
+.table th {
+    background-color: #f4f4f4;
+}
+
+.table img {
+    max-width: 100px; 
+    max-height: 100px;
+}
+
+

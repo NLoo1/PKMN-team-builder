@@ -1,0 +1,38 @@
+body{
+  overflow-x: hidden;
+}
+
+main {
+  width: 100vw;
+  min-height: calc(100vh - 56px); /* Ensure it fills the viewport minus navbar */
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 15vh;
+  padding-bottom: 60px; /* Adjust based on your footer height */
+  background-color: skyblue;
+}
+
+
+.card {
+  padding: 20px;
+}
+
+footer {
+  background-color: black;
+  position: fixed;
+  width: 100vw;
+  bottom: 0; /* Changed from 0% to 0 */
+  display: flex;
+}
+
+
+footer a{
+  color: white;
+  margin-right: 4px;
+}
+
+footer p{
+  color: white;
+}
