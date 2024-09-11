@@ -79,7 +79,7 @@ export function Team({ token, editTeam, deleteTeam, currentUser }) {
               </table>
 
               {(currentUser && 
-  (currentUser.isAdmin === "true" || currentUser.user_id === teamData.user_id)) && (
+  (currentUser.isAdmin === "true" || currentUser.user_id === teamName.user_id.toString())) && (
   <Fragment>
     <Link to={`/teams/${params.id}/delete`}>
       <button className="btn btn-danger my-2">Delete team</button>
