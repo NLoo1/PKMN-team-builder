@@ -1,5 +1,4 @@
 import React from "react";
-import 'reactstrap'
 import { Card, CardBody, CardTitle } from "reactstrap";
 
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import PokeAPI from "./api";
+import PokeAPI from '../services/api';
+
 
 /**
  * Search

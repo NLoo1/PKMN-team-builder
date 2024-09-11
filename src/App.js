@@ -1,18 +1,19 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import NavBar from "./NavBar";
-import "./App.css";
-import { useState, React, Fragment } from "react";
-import Home from "./Home";
-import PokeAPI from "./api.js";
-import LoginUser from "./LoginForm.js";
-import SignupUser from "./Signup.js";
-import { Profile } from "./Profile.js";
-import DeleteUser from "./DeleteUser.js";
-import Page from "./Page.js";
-import EditUser from "./EditProfile.js";
+import NavBar from './components/NavBar';
+import './styles/App.css';
+import { useState, Fragment } from "react";
+import Home from './pages/Home';
+import PokeAPI from './services/api';
+import LoginUser from './components/LoginForm';
+import SignupUser from './components/Signup';
+import Profile from './containers/Profile';
+import DeleteUser from './components/DeleteUser';
+import Page from './layout/Page';
+import EditUser from './containers/EditProfile';
 import axios from 'axios';
-import DeleteTeam from "./DeleteTeam.js";
-import { EditTeam } from "./EditTeam.js";
+import DeleteTeam from './components/DeleteTeam';
+import EditTeam from './containers/EditTeam';
+
 
 /**
  * App

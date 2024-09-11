@@ -1,10 +1,10 @@
-import "./List.css";
+import '../styles/List.css';
 import React, { useEffect, useState } from "react";
-import useFetchItems from "./hooks/useFetchItems";
-import { Search } from "./Search";
-import Item from "./Item";
+import useFetchItems from '../hooks/useFetchItems';
+import Search from '../components/Search';
+import Item from '../components/Item';
 import { Link } from "react-router-dom";
-import PokeAPI from "./api";
+import PokeAPI from '../services/api';
 import { Card, CardBody, CardTitle } from "reactstrap";
 
 // Reusable List Component

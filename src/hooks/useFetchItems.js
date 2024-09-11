@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
-import PokeAPI from "../api";
+import { useState, useEffect } from 'react';
+import { fetchItems } from '../services/api';
+
 
 /**
  * Custom hook to fetch data for List components. 

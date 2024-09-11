@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import PokeAPI from "./api";
+import PokeAPI from '../services/api';
 import { Fragment } from "react";
 import { Link } from "react-router-dom";
+
 
 export function Item({ data, type, isSelectable, isSelected, onCheckboxChange}) {
   const [imageUrl, setImageUrl] = useState("");

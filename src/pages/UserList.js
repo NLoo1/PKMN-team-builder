@@ -1,9 +1,10 @@
-import './List.css'
+
+import '../styles/List.css';  
 import React, { useState } from "react";
-import useFetchItems  from "./hooks/useFetchItems";
-import { Search } from "./Search";
-import Item from "./Item";
-import { Link } from 'react-router-dom';
+import useFetchItems from '../hooks/useFetchItems'; 
+import Search from '../components/Search';  
+import Item from '../components/Item';  
+
 
 export function UserList() {
   const [offset, setOffset] = useState(0);

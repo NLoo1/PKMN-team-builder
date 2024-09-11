@@ -1,10 +1,11 @@
 import React from "react";
 import { Card, CardBody, CardTitle } from "reactstrap";
-import {TeamList, MyTeamList, NewTeam} from "./TeamList.js";  
-import {UserList} from "./UserList.js"; 
-import {PokemonList} from "./PokemonList.js";  
-import { Team } from "./Team.js";
-import './Page.css';
+import { TeamList, MyTeamList, NewTeam } from '../pages/TeamList';
+import { UserList } from '../pages/UserList';
+import { PokemonList } from '../pages/PokemonList';
+import { Team } from '../containers/Team';
+import '../styles/Page.css';
+
 
 
 /**

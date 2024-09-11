@@ -1,9 +1,10 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { Navbar, Nav, NavItem } from "reactstrap";
-import "./NavBar.css";
+import '../styles/NavBar.css';
+import pokeballImage from '../assets/pokeball.png';
 import { useLocation, useNavigate } from "react-router-dom";
-import pokeballImage from './pokeball.png';
+
  
 /**
  * NavBar

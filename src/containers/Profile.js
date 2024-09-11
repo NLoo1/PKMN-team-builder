@@ -1,9 +1,8 @@
 import { Card, CardBody, CardTitle } from "reactstrap";
-import PokeAPI from "./api";
+import PokeAPI from '../services/api';
 import { useState, useEffect } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, Link } from "react-router-dom";
 
-import { Link } from "react-router-dom";
 /**
  * Profile
  * Component exclusively for rendering a user's profile.

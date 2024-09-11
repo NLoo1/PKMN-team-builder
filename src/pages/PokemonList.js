@@ -1,8 +1,9 @@
-import './List.css'
+import '../styles/List.css';
 import React, { useState } from "react";
-import useFetchItems  from "./hooks/useFetchItems";
-import { Search } from "./Search";
-import Item from "./Item";
+import useFetchItems from '../hooks/useFetchItems';
+import Search from '../components/Search';
+import Item from '../components/Item';
+
 
 export function PokemonList() {
   const [offset, setOffset] = useState(0);

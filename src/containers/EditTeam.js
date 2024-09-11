@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Card, CardBody, CardTitle } from "reactstrap";
 import { useParams } from "react-router-dom";
-import PokeAPI from "./api";
-import useFetchItems from "./hooks/useFetchItems"; // Custom hook for fetching items
-import Item from "./Item"; // Component for displaying a Pokémon row
+import PokeAPI from '../services/api';
+import useFetchItems from '../hooks/useFetchItems';
+import Item from '../components/Item';
 
 /**
  * For editing an existing team with prefilled team name and selectable Pokémon.
