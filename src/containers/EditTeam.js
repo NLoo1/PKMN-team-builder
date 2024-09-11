@@ -24,6 +24,7 @@ export function EditTeam({ currentUser, token }) {
   const [loadMoreCount] = useState(20);
   const { id } = useParams(); // Get team ID from URL params
   const [teamOwnerId, setTeamOwnerId] = useState(null);
+  const [error, setError] = useState('');
 
   const { data, getItems } = useFetchItems("new-team", offset, loadMoreCount);
 
@@ -45,6 +46,7 @@ export function EditTeam({ currentUser, token }) {
         setFormData({ teamName: team_name });
       } catch (error) {
         console.error("Error fetching data:", error);
+        setError(error)
       }
     };
 
@@ -54,7 +56,9 @@ export function EditTeam({ currentUser, token }) {
   // Check if the current user is the owner or an admin
   useEffect(() => {
     if (teamOwnerId && currentUser) {
-      if (teamOwnerId !== currentUser.user_id && currentUser.isAdmin === 'false') {
+      console.log(teamOwnerId)
+      console.log(currentUser)
+      if (teamOwnerId.toString() !== currentUser.user_id && currentUser.isAdmin === 'false') {
         alert("You do not have permission to edit this team.");
         window.history.back(); 
       }
@@ -113,6 +117,7 @@ export function EditTeam({ currentUser, token }) {
       setSelectedPokemon(new Set()); // Reset after update
     } catch (error) {
       console.error("Error updating team:", error);
+      setError(error)
       alert("Failed to update team.");
     }
   };
@@ -127,6 +132,8 @@ export function EditTeam({ currentUser, token }) {
     <section className="content">
       <form className="form mb-2" onSubmit={handleUpdateTeam}>
         <Card>
+      {error && <div className="alert alert-danger">{error}</div>}
+
           <CardTitle>
             <label htmlFor="teamName">Edit team name:</label>
           </CardTitle>

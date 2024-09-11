@@ -19,6 +19,7 @@ import PokeAPI from '../services/api';
 const EditUser = ({ editUser, token, currentUser }) => {
   const params = useParams();
   const navigate = useNavigate();
+  const [error, setError] = useState('');
 
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -52,6 +53,7 @@ const EditUser = ({ editUser, token, currentUser }) => {
         setIsAdmin(resp.user.isAdmin);
       } catch (error) {
         console.error("Error fetching user data:", error);
+        setError(error)
         alert("Failed to fetch user data.");
       }
     }
@@ -92,6 +94,7 @@ const EditUser = ({ editUser, token, currentUser }) => {
       navigate('/');
     } catch (error) {
       console.error("Error editing user:", error);
+      setError(error)
       alert("Failed to edit user");
     }
   };
@@ -99,6 +102,7 @@ const EditUser = ({ editUser, token, currentUser }) => {
   return (
     <Card>
       <CardBody>
+      {error && <div className="alert alert-danger">{error}</div>}
         <CardTitle><h1>Change profile:</h1></CardTitle>
 
         <form onSubmit={handleSubmit}>

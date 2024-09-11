@@ -1,19 +1,22 @@
 import '../styles/List.css';
 import React, { useState } from "react";
 import useFetchItems from '../hooks/useFetchItems';
-import {Search} from '../components/Search';
+import { Search } from '../components/Search';
 import Item from '../components/Item';
 
 /**
  * PokemonList displays a paginated list of Pokémon with search and load more functionality.
  * 
- * @returns {JSX.Element} - Rendered PokemonList component
+ * @param {Object} props - The component props.
+ * @param {Object} props.currentUser - The current user object.
+ * 
+ * @returns {JSX.Element} - Rendered PokemonList component.
  */
-export function PokemonList() {
+export function PokemonList({ currentUser }) {
   const [offset, setOffset] = useState(0);
   const [loadMoreCount, setLoadMoreCount] = useState(20);
-  const [isSearching, setIsSearching] = useState(false)
-  const { data, isLoading, getItems, setData } = useFetchItems("pokemon", offset, loadMoreCount);
+  const [isSearching, setIsSearching] = useState(false);
+  const { data, isLoading, getItems, setData } = useFetchItems("pokemon", offset, loadMoreCount, currentUser);
 
   const handleLoadMore = (e) => {
     e.preventDefault();
@@ -37,7 +40,6 @@ export function PokemonList() {
         />
       </div>
 
-
       <div className="table-container">
         <table className="table">
           <thead>
@@ -53,12 +55,11 @@ export function PokemonList() {
           </tbody>
         </table>
 
-        {isSearching === 'false' &&
-        <button onClick={handleLoadMore} className="btn btn-primary mx-auto d-block">
-        Load More
-      </button>
-        }
-        
+        {!isSearching && (
+          <button onClick={handleLoadMore} className="btn btn-primary mx-auto d-block">
+            Load More
+          </button>
+        )}
       </div>
     </section>
   );

@@ -22,6 +22,7 @@ class PokeAPI {
 
     // API related info will be logged for each request
 
+    // Do NOT log data
     console.debug("API Call:", endpoint, data, method);
     // console.debug("Token: " + token)
     const url = `${BASE_URL}/${endpoint}`;
@@ -74,7 +75,6 @@ class PokeAPI {
    * @param {String} username
    * @param {String} token 
    * @returns {User}
-   * @throws {Error} if user not found.
    **/
   static async getUser(username, token) {
     try {
@@ -82,7 +82,6 @@ class PokeAPI {
       return res;
     } catch (error) {
       console.error("Get User Error:", error);
-      throw new Error("User not found.");
     }
   }
 
@@ -91,7 +90,6 @@ class PokeAPI {
    * @param {String} token 
    * @returns {[User]} 
    * 
-   * @throws {Error} if request fails or error
    */
   static async getUsers(token) {
     try {
@@ -99,7 +97,6 @@ class PokeAPI {
       return res.users;
     } catch (error) {
       console.error("Get Users Error:", error);
-      throw new Error("Failed to fetch users.");
     }
   }
 
@@ -127,7 +124,6 @@ class PokeAPI {
    * @param {String} token 
    * @returns {User} - {username, email, isAdmin} if successful
    * 
-   * @throws {Error} if request fails or error
    */
   static async postUserAdmin({ user, token }) {
     try {
@@ -135,7 +131,6 @@ class PokeAPI {
       return res.user;
     } catch (error) {
       console.error("Post User Admin Error:", error);
-      throw new Error("Failed to add user.");
     }
   }
 
@@ -149,7 +144,6 @@ class PokeAPI {
    * @example
    * console.log(filterUsers('test', 'testtoken')) // { [user, email, isAdmin], ... }
    * 
-   * @throws {Error} if request fails or error
    */
   static async filterUsers(username, token) {
     try {
@@ -157,7 +151,6 @@ class PokeAPI {
       return res.users;
     } catch (error) {
       console.error("Filter Users Error:", error);
-      throw new Error("Failed to filter users.");
     }
   }
 
@@ -167,7 +160,6 @@ class PokeAPI {
    * @param {String} username
    * @param {String} token
    * 
-   * @throws {Error} if request fails or error
   */
   static async patchUser(data, username, token) {
     try {
@@ -175,7 +167,6 @@ class PokeAPI {
       return res.user;
     } catch (error) {
       console.error("Patch User Error:", error);
-      throw new Error("Failed to update user.");
     }
   }
 
@@ -185,7 +176,6 @@ class PokeAPI {
    * @param {String} token 
    * @returns
    * 
-   * @throws {Error} if request fails or error
    */
   static async deleteUser(username, token) {
     try {
@@ -193,7 +183,6 @@ class PokeAPI {
       return res;
     } catch (error) {
       console.error("Delete User Error:", error);
-      throw new Error("Failed to delete user.");
     }
   }
 
@@ -207,7 +196,6 @@ class PokeAPI {
  * @param {*} limit Add this to offset to get the number of Pokemon in array
  * @returns Array of Pokemon
  * 
- * @throws {Error} if request fails or error
  */
 static async getAllPokemon(offset = 0, limit = 100) {
   try {
@@ -215,7 +203,6 @@ static async getAllPokemon(offset = 0, limit = 100) {
     return response.data.results;
   } catch (error) {
     console.error("Get All Pokemon Error:", error);
-    throw new Error("Failed to fetch Pokémon.");
   }
 }
 
@@ -231,7 +218,6 @@ static async getAllPokemon(offset = 0, limit = 100) {
  * let image = await getPokemonSpriteByURL(url)
  * <img src={image} /> The front sprite for Clefairy
  * 
- * @throws {Error} if request fails or error
  */
 static async getPokemonSpriteByURL(url) {
   try {
@@ -239,7 +225,6 @@ static async getPokemonSpriteByURL(url) {
     return response.data.sprites.front_default;
   } catch (error) {
     console.error("Get Pokémon Sprite Error:", error);
-    throw new Error("Failed to fetch Pokémon sprite.");
   }
 }
 
@@ -258,7 +243,7 @@ static async getPokemonByGen(){
  * @param {String} token 
  * @returns {[Team]} All teams
  * 
- * @throws {Error} if request fails or error
+ *  
  */
 static async getAllTeams() {
   try {
@@ -277,7 +262,6 @@ static async getAllTeams() {
  * @param {String} token 
  * @returns the team.
  * 
- * @throws {Error} if request fails or error
  */
 static async getTeamById(id) {
   try {
@@ -285,8 +269,7 @@ static async getTeamById(id) {
     return response;
   } catch (error) {
     console.error("Get Team By ID Error:", error);
-    throw new Error("Failed to fetch team.");
-  }
+    }
 }
 
 /**
@@ -295,7 +278,6 @@ static async getTeamById(id) {
  * @param {Object} data -- Should be formatted as {name (String), pokemon (Array)} 
  * @param {String} token 
  * 
- * @throws {Error} if request fails or error
  */
 static async createTeam(data, token) {
   try {
@@ -303,7 +285,6 @@ static async createTeam(data, token) {
     return response;
   } catch (error) {
     console.error("Create Team Error:", error);
-    throw new Error("Failed to create team.");
   }
 }
 
@@ -313,7 +294,6 @@ static async createTeam(data, token) {
  * @param {*} data 
  * @param {String} token 
  * 
- * @throws {Error} if request fails or error
  */
 static async patchTeam(id, data, token) {
   try {
@@ -321,7 +301,6 @@ static async patchTeam(id, data, token) {
     return response;
   } catch (error) {
     console.error("Patch Team Error:", error);
-    throw new Error("Failed to update team.");
   }
 }
 
@@ -330,7 +309,6 @@ static async patchTeam(id, data, token) {
  * @param {Integer} id - team id
  * @param {String} token 
  * 
- * @throws {Error} if request fails or error
  */
 static async deleteTeam(id, token) {
   try {
@@ -338,7 +316,6 @@ static async deleteTeam(id, token) {
     return response;
   } catch (error) {
     console.error("Delete Team Error:", error);
-    throw new Error("Failed to delete team.");
   }
 }
 
@@ -350,7 +327,6 @@ static async deleteTeam(id, token) {
  * @param {*} data -> {team_id, user_id, Array(Pokemon)} 
  * @param {String} token 
  * 
- * @throws {Error} if request fails or error
  */
 static async addPokemonToTeam(id, data, token) {
   try {
@@ -371,7 +347,6 @@ static async addPokemonToTeam(id, data, token) {
     return response;
   } catch (error) {
     console.error("Add Pokemon to Team Error:", error);
-    throw new Error("Failed to add Pokémon to team.");
   }
 }
 
@@ -380,8 +355,7 @@ static async addPokemonToTeam(id, data, token) {
  * Retrieves all Pokemon details in a specific team.
  * 
  * @param {Integer} id
- *  * 
- * @throws {Error} if request fails or error
+ *  
  */
 static async getAllPokemonInTeam(id) {
   try {
@@ -389,7 +363,6 @@ static async getAllPokemonInTeam(id) {
     return response;
   } catch (error) {
     console.error("Get All Pokémon in Team Error:", error);
-    throw new Error("Failed to fetch Pokémon in team.");
   }
 }
 
@@ -397,7 +370,7 @@ static async getAllPokemonInTeam(id) {
 // This refers to all teams under one user
 
 /**
- * Get all teams under a user
+ * Get all teams under the logged in user
  * @description - teams are relative to currently logged in user
  * @param {String} token - passed from local storage
  * @throws {Error} if request fails or error
@@ -408,7 +381,21 @@ static async getAllUserTeams(token) {
     return response;
   } catch (error) {
     console.error("Get All User Teams Error:", error);
-    throw new Error("Failed to fetch user's teams.");
+  }
+}
+
+/**
+ * Get all teams under a user 
+ * @description - teams are relative to currently logged in user
+ * @param {String} token - passed from local storage
+ * @throws {Error} if request fails or error
+ */
+static async getProfileTeams(id) {
+  try {
+    const response = await this.request(`teams/user/${id}`);
+    return response;
+  } catch (error) {
+    console.error("Get All Profile Teams Error:", error);
   }
 }
 
@@ -419,7 +406,6 @@ static async getAllUserTeams(token) {
  * @param {Integer} id 
  * @param {*} token 
  * @returns the users team
- * @throws {Error} if request fails or error
  */
 static async getUserTeamById(id, token) {
   try {
@@ -427,7 +413,6 @@ static async getUserTeamById(id, token) {
     return response;
   } catch (error) {
     console.error("Get User Team By ID Error:", error);
-    throw new Error("Failed to fetch user's team.");
   }
 }
 
@@ -439,7 +424,6 @@ static async getUserTeamById(id, token) {
  * 
  * @returns team details
  * 
- * @throws {Error} if request fails or error
  */
 static async createUserTeam(data, token) {
   try {
@@ -447,7 +431,6 @@ static async createUserTeam(data, token) {
     return response;
   } catch (error) {
     console.error("Create User Team Error:", error);
-    throw new Error("Failed to create user's team.");
   }
 }
 
@@ -461,7 +444,6 @@ static async createUserTeam(data, token) {
  * 
  * @returns the updated team data
  * 
- * @throws {Error}  if request fails or error
  */
 static async patchUserTeam(id, data, token) {
   try {
@@ -480,7 +462,6 @@ static async patchUserTeam(id, data, token) {
  * @param {number|string} id 
  * @param {string} token 
  * 
- * @throws {Error} if request fails or error
  */
 static async deleteUserTeam(id, token) {
   try {
@@ -488,7 +469,6 @@ static async deleteUserTeam(id, token) {
     return response;
   } catch (error) {
     console.error("Delete User Team Error:", error);
-    throw new Error("Failed to delete user's team.");
   }
 }
 

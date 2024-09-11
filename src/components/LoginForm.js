@@ -87,6 +87,7 @@ const LoginUser = ({ login }) => {
               value={formData.password}
               onChange={handleChange}
               className='form-control'
+              autoComplete="true"
             />
           </div>
 

@@ -10,11 +10,11 @@ import Item from '../components/Item';
  * 
  * @returns {JSX.Element} - Rendered UserList component
  */
-export function UserList() {
+export function UserList({currentUser}) {
   const [offset, setOffset] = useState(0);
   const [loadMoreCount, setLoadMoreCount] = useState(20);
   const [isSearching, setIsSearching] = useState(false)
-  const { data, isLoading, getItems, setData } = useFetchItems("users", offset, loadMoreCount);
+  const { data, isLoading, getItems, setData } = useFetchItems("users", offset, loadMoreCount,  currentUser={currentUser});
 
   const handleLoadMore = (e) => {
     e.preventDefault();
@@ -51,7 +51,7 @@ export function UserList() {
             ))}
           </tbody>
         </table>
-        {isSearching === 'false' &&
+        {!isSearching &&
         <button onClick={handleLoadMore} className="btn btn-primary mx-auto d-block">
         Load More
       </button>

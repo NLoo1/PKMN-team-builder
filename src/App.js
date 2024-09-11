@@ -21,7 +21,7 @@ import {EditTeam} from './containers/EditTeam';
  */
 function App() {
   // Keep track of current user. If there is no local storage (the user is logged out), just set to null
-  const [currentUser, setCurrentUser] = useState(localStorage.user || null);
+  const [currentUser, setCurrentUser] = useState({username: localStorage.user, isAdmin: localStorage.isAdmin, user_id: localStorage.id, token: localStorage.token }|| null);
   const [token, setToken] = useState(localStorage.token || null);
 
   /**
@@ -30,7 +30,7 @@ function App() {
    * @param {*} user The form data from Signup.js
    */
   async function addUser(user) {
-    console.log(user)
+    // console.log(user)
     try {
       const resp = await PokeAPI.register({
         username: user.username,
@@ -38,10 +38,13 @@ function App() {
         email: user.email,
       });
 
+      console.log(resp)
       setToken(resp.token);
-      setCurrentUser(resp.username);
+      setCurrentUser({username: resp.username, isAdmin: resp.isAdmin, token: resp.token, user_id:resp.id});
       localStorage.user = resp.username;
       localStorage.token = resp.token;
+      localStorage.isAdmin = resp.isAdmin;
+      localStorage.id = resp.id
 
       console.log(`Successfully registered ${resp.username}!`);
     } catch (error) {
@@ -63,12 +66,14 @@ function App() {
       const resp = await PokeAPI.login(username, password);
       console.log(resp)
       setToken(resp.token);
-      setCurrentUser(username);
+      setCurrentUser({username: resp.username, isAdmin: resp.isAdmin, token: resp.token, user_id:resp.id});
       localStorage.user = username;
+      localStorage.id = resp.id
       localStorage.token = resp.token;
       localStorage.isAdmin = resp.isAdmin;
     } catch (e) {
       console.error("Could not login: " + e);
+      throw Error(e)
     }
   }
 
@@ -86,7 +91,6 @@ function App() {
 // Edit user. Admin or same user only
 async function editUser(user, username) {
 
-  // console.log(user)
   try {
     // Make the API call to update the user's profile
     const resp = await PokeAPI.patchUser(
@@ -98,7 +102,7 @@ async function editUser(user, username) {
         isAdmin: user.makeAdmin,
       },
       username,
-      localStorage.token
+      currentUser.token
     );
 
     console.log(`Successfully edited ${resp.username}!`);
@@ -106,21 +110,23 @@ async function editUser(user, username) {
     // Check if the edited user is the same as the currently logged-in user
     if (localStorage.user === username) {
       // If the username has been changed, update it in local storage
-      if (localStorage.user !== user.username) {
-        localStorage.user = user.username;
-        setCurrentUser(user.username);
-      }
 
       // Re-authenticate and update the token if the current user edited their own profile
       const newTokenResp = PokeAPI.login(user.username, user.password);
       localStorage.token = newTokenResp.token;
+      
       setToken(newTokenResp.token);
+      setCurrentUser({username: newTokenResp.username, 
+        isAdmin: newTokenResp.isAdmin, token: newTokenResp.token, 
+        user_id:newTokenResp.id});
+
 
       console.log('Token updated successfully after username change.');
     }
 
   } catch (e) {
     console.error(`Failed to edit user: ${e}`);
+    throw new Error(e)
   }
 }
 
@@ -129,12 +135,13 @@ async function editUser(user, username) {
   async function deleteUser(username) {
     try {
       await PokeAPI.deleteUser(username,
-        localStorage.token
+        currentUser.token
       );
       console.log(`Successfully deleted ${username}!`);
       logout()
     } catch (e) {
       console.error(`Failed to delete user: ${e}`);
+      throw new Error(e)
     }
   }
   // // Function to save team changes

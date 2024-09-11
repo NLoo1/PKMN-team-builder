@@ -23,6 +23,7 @@ export function Team({ token, editTeam, deleteTeam, currentUser }) {
   const [teamData, setTeamData] = useState([]);
   const [teamName, setTeamName] = useState("New Team");
   const params = useParams();
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function fetchTeamData() {
@@ -34,6 +35,7 @@ export function Team({ token, editTeam, deleteTeam, currentUser }) {
         setIsLoaded(true);
       } catch (err) {
         console.error("Error fetching team data:", err);
+        setError(err)
       }
     }
     fetchTeamData();
@@ -41,6 +43,7 @@ export function Team({ token, editTeam, deleteTeam, currentUser }) {
 
   return (
     <section className="content">
+      {error && <div className="alert alert-danger">{error}</div>}
       {isLoaded && teamData.length > 0 ? (
         <section>
           <Card>
@@ -76,7 +79,7 @@ export function Team({ token, editTeam, deleteTeam, currentUser }) {
               </table>
 
               {(currentUser && 
-  (localStorage.isAdmin === "true" || localStorage.id === teamData.user_id)) && (
+  (currentUser.isAdmin === "true" || currentUser.user_id === teamData.user_id)) && (
   <Fragment>
     <Link to={`/teams/${params.id}/delete`}>
       <button className="btn btn-danger my-2">Delete team</button>

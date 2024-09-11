@@ -32,13 +32,14 @@ export function Profile({ currentUser, token, editUser, deleteUser }) {
       let resp;
 
       if (location.pathname.includes("/profile")) {
-        resp = await PokeAPI.getUser(currentUser, token);
+        resp = await PokeAPI.getUser(currentUser.username, token);
       } else if (location.pathname.includes("/users")) {
         resp = await PokeAPI.getUser(params.username, token);
       }
 
       setUserData(resp);
-      const team = await PokeAPI.getAllUserTeams(resp.user_id, token);
+
+      const team = await PokeAPI.getProfileTeams(resp.user.username);
       setUserTeams(team);
 
       setIsLoaded(true);
@@ -84,6 +85,7 @@ export function Profile({ currentUser, token, editUser, deleteUser }) {
               </section>
             )}
 
+            
             <table className="table table-striped my-3">
               <thead>
                 <tr>
@@ -91,11 +93,10 @@ export function Profile({ currentUser, token, editUser, deleteUser }) {
                 </tr>
               </thead>
               <tbody>
-                {" "}
                 {/* Added tbody for table body */}
-                {userTeams.map((team, index) => (
+                {userTeams.length > 0 ?
+                userTeams.map((team, index) => (
                   <tr key={index}>
-                    {" "}
                     {/* Added key prop */}
                     <td>
                       <Link to={`/teams/${team.team_id}`}>
@@ -103,7 +104,11 @@ export function Profile({ currentUser, token, editUser, deleteUser }) {
                       </Link>
                     </td>
                   </tr>
-                ))}
+                ))
+                :
+                <td>This user has no teams.</td>
+                }
+                {}
               </tbody>
             </table>
           </Card>

@@ -26,6 +26,7 @@ function ListComponent({
   createTeamButton,
   renderItems,
   noItemsMessage,
+  currentUser
 }) {
   const [offset, setOffset] = useState(0);
   const [loadMoreCount, setLoadMoreCount] = useState(20);
@@ -33,7 +34,8 @@ function ListComponent({
   const { data, isLoading, getItems, setData, totalCount } = useFetchItems(
     type,
     offset,
-    loadMoreCount
+    loadMoreCount,
+    currentUser={currentUser}
   );
 
   // Handler for the 'Load More' button
@@ -105,7 +107,8 @@ function ListComponent({
  * 
  * @returns {JSX.Element} - Rendered TeamList component
  */
-export function TeamList() {
+export function TeamList({currentUser}) {
+  
   return (
     <ListComponent
       type="teams"
@@ -114,6 +117,7 @@ export function TeamList() {
       renderItems={(data) =>
         data.map((team, i) => <Item key={i} data={team} type="teams" />)
       }
+      currentUser = {currentUser}
       noItemsMessage="No teams found!"
     />
   );
@@ -124,7 +128,7 @@ export function TeamList() {
  * 
  * @returns {JSX.Element} - Rendered MyTeamList component
  */
-export function MyTeamList() {
+export function MyTeamList({currentUser}) {
   return (
     <ListComponent
       type="my-teams"
@@ -133,6 +137,7 @@ export function MyTeamList() {
       renderItems={(data) =>
         data.map((team, i) => <Item key={i} data={team} type="my-teams" />)
       }
+      currentUser = {currentUser}
       noItemsMessage="You don't have any teams!"
     />
   );
@@ -143,17 +148,19 @@ export function MyTeamList() {
  * @description same thing as /pokemon, but with checkboxes and ability to key in team name
  * @requires token - user should be logged in
  */
-export function NewTeam() {
+export function NewTeam({currentUser}) {
   const [selectedPokemon, setSelectedPokemon] = useState(new Set());
   const [formData, setFormData] = useState({ teamName: "" });
   const [offset, setOffset] = useState(0);
   const [loadMoreCount] = useState(20);
   const [isSearching, setIsSearching] = useState(false);
+  const [error, setError] = useState('');
 
   const { data, isLoading, getItems, setData } = useFetchItems(
     "new-team",
     offset,
-    loadMoreCount
+    loadMoreCount,
+    currentUser={currentUser}
   );
 
   useEffect(() => {
@@ -236,6 +243,7 @@ export function NewTeam() {
       setSelectedPokemon(new Set()); // Reset selected Pokémon
     } catch (error) {
       console.error("Error creating team:", error);
+      setError(error)
       alert("Failed to create team.");
     }
   };
@@ -251,6 +259,8 @@ export function NewTeam() {
       />
       <form className="form mb-2" onSubmit={handleCreateTeam}>
         <Card>
+      {error && <div className="alert alert-danger">{error}</div>}
+
           <CardTitle>
             <label htmlFor="teamName">Enter team name:</label>
           </CardTitle>
