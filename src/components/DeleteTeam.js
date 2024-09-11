@@ -3,70 +3,62 @@ import { Card, CardBody, CardTitle } from "reactstrap";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import PokeAPI from '../services/api';
 
-
 /**
  * DeleteTeam
- * Form for deleting a team. Only the user or an admin should be able to access
+ * 
+ * Form for deleting a team. Only the user who owns the team or an admin should be able to access this component.
+ * It fetches the team details based on the team ID from the URL parameters, checks user permissions, and allows
+ * the deletion of the team if authorized.
+ * 
+ * @param {Object} props - The props object.
+ * @param {Function} props.deleteTeam - Function to call for deleting a team.
+ * @param {string} props.token - Authentication token used for API requests.
+ * @param {Object} props.currentUser - The current logged-in user's information.
+ * @param {string} props.currentUser.user_id - The ID of the current user.
+ * @param {boolean} props.currentUser.isAdmin - Whether the current user is an admin.
+ * 
+ * @returns {JSX.Element} The rendered component.
  */
-const DeleteTeam = ({ deleteTeam ,token}) => {
-
-  // Route is under /users/:username/edit, so username can be fetched here
-  const params = useParams()
-  const [teamName, setTeamName] = useState('New Team')
-
-  const [isLoaded, setIsLoaded] = useState(false)
-
+const DeleteTeam = ({ deleteTeam, token, currentUser }) => {
+  const params = useParams();
+  const [teamName, setTeamName] = useState('New Team');
+  const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
 
-  // Delete team. Only an admin or same user should be able to use this
-  async function deleteTeam(id) {
-    try {
-      await PokeAPI.deleteTeam(id,
-        localStorage.token
-      );
-      console.log(`Successfully deleted ${id}!`);
-    } catch (e) {
-      console.error(`Failed to delete team: ${e}`);
+  useEffect(() => {
+    async function getTeam() {
+      try {
+        // Fetch team details
+        const resp = await PokeAPI.getTeamById(params.id, token);
+
+        // Check if the current user is allowed to delete the team
+        if ((resp.user_id !== currentUser.user_id) && !currentUser.isAdmin) {
+          alert('You are not authorized to delete this team.');
+          navigate('/');
+          return;
+        }
+
+        setTeamName(resp.team_name);
+      } catch (error) {
+        console.error("Error fetching team:", error);
+        navigate('/'); // Redirect if there's an error fetching the team
+      } finally {
+        setIsLoaded(true);
+      }
     }
-  }
 
-
-  useEffect( () => {
-
-        async function getTeam(){
-
-            // Fetch team name
-            const resp = await PokeAPI.getTeamById(params.id, localStorage.token)
-            const username = await PokeAPI.getUser(localStorage.user, localStorage.token)
-
-
-            if((resp.user_id !== username.user.user_id) && localStorage.isAdmin === 'false'){
-                alert('No.')
-                navigate('/')
-            }
-
-            setTeamName(resp.team_name)
-        }
-        getTeam()
-        setIsLoaded(true)
-        }
-    , [isLoaded, params.id, navigate ])
-
-
+    getTeam();
+  }, [params.id, currentUser, token, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-  
+
     try {
-      await deleteTeam(params.id, token);
-      alert(`Successfully deleted`)
-      navigate('/')
-      
+      await PokeAPI.deleteTeam(params.id, token);
+      alert(`Successfully deleted team ${teamName}`);
+      navigate('/');
     } catch (error) {
       console.error("Error deleting team:", error);
-      
-      // Handle error appropriately (e.g., show error message)
       alert("Failed to delete team");
     }
   };
@@ -74,13 +66,15 @@ const DeleteTeam = ({ deleteTeam ,token}) => {
   return (
     <Card>
       <CardBody>
-        <CardTitle><h1>Are you sure you want to delete team {teamName}?</h1></CardTitle>
-
-        <form onSubmit={handleSubmit}>
-            
-          <button type='submit' className='btn btn-danger p-2 m-2'>Confirm</button>
-          <Link to='/'><button type='submit' className='btn btn-primary p-2'>Back</button></Link>
-        </form>
+        <CardTitle>
+          <h1>Are you sure you want to delete team {teamName}?</h1>
+        </CardTitle>
+        {isLoaded && (
+          <form onSubmit={handleSubmit}>
+            <button type='submit' className='btn btn-danger p-2 m-2'>Confirm</button>
+            <Link to='/'><button type='button' className='btn btn-primary p-2'>Back</button></Link>
+          </form>
+        )}
       </CardBody>
     </Card>
   );

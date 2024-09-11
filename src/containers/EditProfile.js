@@ -3,12 +3,20 @@ import { Card, CardBody, CardTitle } from "reactstrap";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import PokeAPI from '../services/api';
 
-
 /**
- * EditUser
- * Form for editing a user. Only the user or an admin should be able to access.
+ * EditUser - Component for rendering a form to edit a user's profile.
+ * Allows the current user or an admin to update user details including username, email, 
+ * bio, password, and admin status.
+ * 
+ * @param {Object} props - The props for the component.
+ * @param {Function} props.editUser - Function to handle the user update.
+ * @param {string} props.token - Authentication token used for API requests.
+ * @param {Object} props.currentUser - The currently logged-in user object.
+ * 
+ * @returns {JSX.Element} - Rendered form for editing user profile with validation 
+ *                           and submission functionality.
  */
-const EditUser = ({ editUser, token }) => {
+const EditUser = ({ editUser, token, currentUser }) => {
   const params = useParams();
   const navigate = useNavigate();
 
@@ -25,7 +33,8 @@ const EditUser = ({ editUser, token }) => {
 
   useEffect(() => {
     async function getProfile() {
-      if (params.username !== localStorage.user && localStorage.isAdmin === 'false') {
+      // Check if the current user is authorized to edit this profile
+      if (params.username !== currentUser.username && !currentUser.isAdmin) {
         alert("Cannot edit another user's profile.");
         navigate('/');
         return;
@@ -38,7 +47,7 @@ const EditUser = ({ editUser, token }) => {
           bio: resp.user.bio || '',
           password: '',
           confirmPassword: '',
-          makeAdmin: resp.user.isAdmin || false // Initialize checkbox based on user data
+          makeAdmin: resp.user.isAdmin || false 
         });
         setIsAdmin(resp.user.isAdmin);
       } catch (error) {
@@ -47,7 +56,7 @@ const EditUser = ({ editUser, token }) => {
       }
     }
     getProfile();
-  }, [params.username, token, navigate]);
+  }, [params.username, currentUser, token, navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -160,7 +169,7 @@ const EditUser = ({ editUser, token }) => {
             />
           </div>
   
-          {localStorage.isAdmin === 'true' && !isAdmin &&
+          {currentUser.isAdmin && !isAdmin &&
             <div className="form-check p-2">
               <input
                 id="makeAdmin"

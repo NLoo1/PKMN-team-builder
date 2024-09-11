@@ -3,11 +3,22 @@ import PokeAPI from '../services/api';
 
 
 /**
- * Search
- *
- * Search bar rendered inside a List, above the table.
- * Will update the table to match the search query.
- * The entire table will return with an empty search query.
+ * Search - A component for rendering a search bar to filter data in a list.
+ * 
+ * Provides a text input for users to type their search query and a button to trigger the search.
+ * Based on the provided type, it will fetch and filter data accordingly, updating the displayed items.
+ * Resets the search and fetches all items when the search query is empty.
+ * 
+ * @param {Object} props - The props for the component.
+ * @param {Function} props.getItems - Function to fetch items when search is cleared or for initial load.
+ * @param {string} props.location - The current location or route; can be used for context-specific logic (not used in the provided code).
+ * @param {Function} props.setData - Function to set the data for the list based on the search result.
+ * @param {Function} props.setLoadMoreCount - Function to set the number of items to load on further requests.
+ * @param {Function} props.setOffset - Function to set the offset for pagination.
+ * @param {Function} props.setIsSearching - Function to set the search state (true/false) while searching.
+ * @param {string} props.type - The type of data to search (e.g., "users", "pokemon", "teams").
+ * 
+ * @returns {JSX.Element} - Rendered search bar with input and submit button.
  */
 export function Search({ getItems, location, setData, setLoadMoreCount, setOffset, setIsSearching, type }) {
   const [search, setSearch] = useState("");

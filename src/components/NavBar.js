@@ -7,9 +7,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 
  
 /**
- * NavBar
+ * NavBar - A navigation bar component that displays links based on user authentication and route.
  * 
- * Navigation bar that persists between routes. Conditionally shows links depending on route
+ * This component includes navigation links that persist between routes. It conditionally shows or hides links
+ * based on the current route and user authentication status. It also handles user logout functionality.
+ * 
+ * @param {Object} props - The props for the component.
+ * @param {Object|null} props.currentUser - The currently logged-in user. If null, no user is logged in.
+ * @param {Function} props.logout - Function to handle user logout.
+ * 
+ * @returns {JSX.Element} - Rendered navigation bar with conditionally displayed links.
  */
 function NavBar({currentUser, logout}) {
 

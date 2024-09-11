@@ -1,19 +1,21 @@
-import { useState, useEffect } from 'react';
-import { fetchItems } from '../services/api';
-
+import { useState, useEffect, useCallback } from 'react';
+import PokeAPI from '../services/api';
 
 /**
- * Custom hook to fetch data for List components. 
- * Based on props 'type' passed, different data will be fetched.
+ * Custom hook to fetch data for List components.
+ * Based on the 'type' prop, this hook will fetch different types of data (e.g., Pokémon, users, teams).
  * 
- * @param {String} type 
- * @param {Integer} offset Range from which to begin fetching data. 
- * @param {Integer} loadMoreCount Default 20; How many entries to load upon clicking Load More button 
+ * @param {string} type - The type of items to fetch. Can be 'pokemon', 'new-team', 'users', 'teams', or 'my-teams'.
+ * @param {number} offset - The starting point from which data should be fetched.
+ * @param {number} loadMoreCount - How many entries to fetch at a time (default is 20).
  * 
- * RANGE OF LOADING ENTRIES ==> (0 + offset) to (offset+loadMoreCount)
- * 
- * @returns {[Object]} - the items
- */
+ * @returns {{
+*   data: Object[],    // Array of items fetched based on the type.
+*   isLoading: boolean, // Indicator for whether the data is currently being loaded.
+*   getItems: Function, // Function to trigger fetching of more items.
+*   setData: Function   // Function to manually update the data state.
+* }}
+*/
 export default function useFetchItems(type, offset, loadMoreCount) {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +34,7 @@ export default function useFetchItems(type, offset, loadMoreCount) {
           items = await PokeAPI.getUsers(localStorage.token);
           break;
         case "teams":
-          items = await PokeAPI.getAllTeams(localStorage.token);
+          items = await PokeAPI.getAllTeams();
           break;
         case "my-teams":
           items = await PokeAPI.getAllUserTeams(localStorage.token);
@@ -44,7 +46,6 @@ export default function useFetchItems(type, offset, loadMoreCount) {
 
       // For Pokémon data, format items to include pokemon_id and pokemon_name
       if (type === "pokemon" || type === "new-team") {
-        // Assuming each item in the response has an id and name property
         items = items.map(pokemon => ({
           pokemon_id: pokemon.id,
           pokemon_name: pokemon.name,
@@ -62,7 +63,6 @@ export default function useFetchItems(type, offset, loadMoreCount) {
   }, [type, offset, loadMoreCount]);
 
   useEffect(() => {
-    // Reset data only if not in 'pokemon' or 'new-team' mode to expand the list
     if (type !== 'pokemon' && type !== 'new-team') setData([]);
     getItems();
   }, [getItems, type]);

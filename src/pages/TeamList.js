@@ -1,13 +1,25 @@
 import '../styles/List.css';
 import React, { useEffect, useState } from "react";
 import useFetchItems from '../hooks/useFetchItems';
-import Search from '../components/Search';
+import {Search} from '../components/Search';
 import Item from '../components/Item';
 import { Link } from "react-router-dom";
 import PokeAPI from '../services/api';
 import { Card, CardBody, CardTitle } from "reactstrap";
+import { Fragment } from 'react';
 
-// Reusable List Component
+/**
+ * ListComponent displays a list of items with support for search and pagination. Reusable for creation and editing of teams.
+ * 
+ * @param {Object} props - Component props
+ * @param {string} props.type - Type of items being fetched (e.g., 'pokemon', 'teams')
+ * @param {string} props.title - Title of the table header
+ * @param {boolean} [props.createTeamButton=false] - If true, displays a button to create a new team
+ * @param {function(Array): JSX.Element} props.renderItems - Function to render items in the table body
+ * @param {string} props.noItemsMessage - Message to display when no items are available
+ * 
+ * @returns {JSX.Element} - Rendered ListComponent
+ */
 function ListComponent({
   type,
   title,
@@ -88,7 +100,11 @@ function ListComponent({
   );
 }
 
-// List of teams
+/**
+ * TeamList displays a list of teams using the ListComponent.
+ * 
+ * @returns {JSX.Element} - Rendered TeamList component
+ */
 export function TeamList() {
   return (
     <ListComponent
@@ -103,7 +119,11 @@ export function TeamList() {
   );
 }
 
-// List of teams owned by the logged-in user
+/**
+ * MyTeamList displays a list of teams owned by the logged-in user using the ListComponent.
+ * 
+ * @returns {JSX.Element} - Rendered MyTeamList component
+ */
 export function MyTeamList() {
   return (
     <ListComponent
@@ -137,48 +157,36 @@ export function NewTeam() {
   );
 
   useEffect(() => {
-    setData([]);
+    setData([]); 
     setOffset(0);
     getItems();
-  }, [getItems]);
+  }, [getItems, setData]);
 
   const handleLoadMore = (e) => {
     e.preventDefault();
     setOffset((prevOffset) => prevOffset + loadMoreCount);
   };
 
-// Handle any changes in checkboxes
-const handleCheckboxChange = (pokemon) => {
-  // Update selected Pokémon
-  setSelectedPokemon((prevSelected) => {
-    const newSelected = new Set(prevSelected);
+  // Handle checkbox changes
+  const handleCheckboxChange = (pokemon) => {
+    setSelectedPokemon((prevSelected) => {
+      const newSelected = new Set(prevSelected);
 
-    // Check if Pokémon is already selected based on its ID
-    const isSelected = Array.from(newSelected).some(
-      (p) => p.id === pokemon.id
-    );
+      // Check if the Pokémon is already selected based on its ID
+      if (newSelected.has(pokemon.id)) {
+        newSelected.delete(pokemon.id); // Remove Pokémon
+      } else if (newSelected.size < 6) {
+        newSelected.add(pokemon.id); // Add Pokémon if less than 6 are selected
+      } else {
+        alert("You can only add up to 6 Pokémon to a team.");
+      }
 
-    if (isSelected) {
-      // Remove Pokémon if already selected
-      newSelected.forEach((p) => {
-        if (p.id === pokemon.id) {
-          newSelected.delete(p);
-        }
-      });
-    } else if (newSelected.size < 6) {
-      // Add Pokémon if less than 6 are selected
-      newSelected.add(pokemon);
-    } else {
-      alert("Up to 6 Pokémon may be added.");
-    }
+      console.log(newSelected);
+      return newSelected;
+    });
+  };
 
-    console.log(newSelected);
-    return newSelected;
-  });
-};
-
-
-  // Handle any changes in team name
+  // Handle changes to the team name input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
@@ -187,61 +195,50 @@ const handleCheckboxChange = (pokemon) => {
     }));
   };
 
-  /**
-   * Handling for team creation.
-   * @description accesses API to create team on Team table, then populates teams_pokemon table
-   * @param {*} e - the Create Team button
-   * @throws {Error} - if there's any issue with team creation (usually API issues)
-   */
-  async function handleCreateTeam(e) {
+  // Handle team creation
+  const handleCreateTeam = async (e) => {
     e.preventDefault();
     if (selectedPokemon.size === 0) {
       alert("Please select at least one Pokémon to create a team.");
       return;
     }
-  
+
     try {
       const user = await PokeAPI.getUser(localStorage.user, localStorage.token);
-  
+
       // Create team
       const team = await PokeAPI.createTeam(
         {
           team_name: formData.teamName || "New Team",
-          user_id: user.user.user_id, // Find user id
+          user_id: user.user.user_id,
         },
         localStorage.token
       );
-  
-      const user_id = team.team.user_id;
+
       const team_id = team.team.team_id;
-  
-      // Prepare an array of Pokémon IDs for the API
-      const pokemonToAdd = Array.from(selectedPokemon).map((p) => ({
-        pokemon_id: p.id, // Using ID instead of name
-        pokemon_name: p.name,
+
+      // Prepare an array of Pokémon IDs
+      const pokemonToAdd = Array.from(selectedPokemon).map((pokemon_id) => ({
+        pokemon_id,
       }));
-  
+
       // Populate teams_pokemon
       await PokeAPI.addPokemonToTeam(
         team_id,
         {
-          user_id: user_id,
-          team_id: team_id,
+          team_id,
           pokemon: pokemonToAdd,
         },
         localStorage.token
       );
-  
+
       alert("Team created successfully!");
-  
-      // Reset set
-      setSelectedPokemon(new Set());
+      setSelectedPokemon(new Set()); // Reset selected Pokémon
     } catch (error) {
       console.error("Error creating team:", error);
       alert("Failed to create team.");
     }
-  }
-  
+  };
 
   return (
     <section className="content">
@@ -286,19 +283,19 @@ const handleCheckboxChange = (pokemon) => {
           </tr>
         </thead>
         <tbody>
-        {data.map((pokemon, i) => (
-  <Item
-    key={pokemon.id || i}  // Use the ID or fallback to the index
-    data={pokemon}
-    type="pokemon"
-    isSelectable={true}
-    isSelected={Array.from(selectedPokemon).some((p) => p.id === pokemon.id)}
-    onCheckboxChange={() => handleCheckboxChange(pokemon)}
-  />
-))}
-
+          {data.map((pokemon, i) => (
+            <Item
+              key={pokemon.id || i} // Use the ID or fallback to the index
+              data={pokemon}
+              type="pokemon"
+              isSelectable={true}
+              isSelected={selectedPokemon.has(pokemon.id)}
+              onCheckboxChange={() => handleCheckboxChange(pokemon)}
+            />
+          ))}
         </tbody>
       </table>
+
       {!isSearching && (
         <button
           onClick={handleLoadMore}

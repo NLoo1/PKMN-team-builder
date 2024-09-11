@@ -6,13 +6,13 @@ import Home from './pages/Home';
 import PokeAPI from './services/api';
 import LoginUser from './components/LoginForm';
 import SignupUser from './components/Signup';
-import Profile from './containers/Profile';
+import {Profile} from './containers/Profile';
 import DeleteUser from './components/DeleteUser';
 import Page from './layout/Page';
 import EditUser from './containers/EditProfile';
-import axios from 'axios';
+// import axios from 'axios';
 import DeleteTeam from './components/DeleteTeam';
-import EditTeam from './containers/EditTeam';
+import {EditTeam} from './containers/EditTeam';
 
 
 /**
@@ -61,6 +61,7 @@ function App() {
   async function login({ username, password }) {
     try {
       const resp = await PokeAPI.login(username, password);
+      console.log(resp)
       setToken(resp.token);
       setCurrentUser(username);
       localStorage.user = username;
@@ -136,15 +137,15 @@ async function editUser(user, username) {
       console.error(`Failed to delete user: ${e}`);
     }
   }
-  // Function to save team changes
-  async function saveTeamChanges(teamId, newOrder) {
-    try {
-      const response = await axios.patch(`/teams/${teamId}/reorder`, { newOrder });
-      console.log('Team reordered successfully:', response.data.message);
-    } catch (error) {
-      console.error('Error reordering team:', error.response ? error.response.data : error.message);
-    }
-  }
+  // // Function to save team changes
+  // async function saveTeamChanges(teamId, newOrder) {
+  //   try {
+  //     const response = await axios.patch(`/teams/${teamId}/reorder`, { newOrder });
+  //     console.log('Team reordered successfully:', response.data.message);
+  //   } catch (error) {
+  //     console.error('Error reordering team:', error.response ? error.response.data : error.message);
+  //   }
+  // }
 
   return (
     <div className="app">
@@ -162,6 +163,10 @@ async function editUser(user, username) {
               <Fragment>
                 <Route path="/login" element={<LoginUser login={login} />} />
                 <Route path="/signup" element={<SignupUser addUser={addUser} />} />
+                <Route path="/teams" element={<Page type='teams' />} />
+                <Route path="/teams/:id" element={<Page type='team-details' />} />
+
+
               </Fragment>
             ) : (
               <Fragment>
@@ -172,18 +177,17 @@ async function editUser(user, username) {
                 <Route path="/users/:username/edit" element={<EditUser currentUser={currentUser} token={token} editUser={editUser} />} />
                 <Route path="/users/:username/delete" element={<DeleteUser currentUser={currentUser} token={token} deleteUser={deleteUser} />} />
 
-                <Route path="/teams" element={<Page type='teams' />} />
-                <Route path="/teams/:id" element={<Page type='team-details' />} />
-                <Route path="/teams/:id/edit" element={<EditTeam />} />
-                <Route path="/teams/:id/delete" element={<DeleteTeam />} />
-                <Route path="/teams/new" element={<Page type='new-team' />} />
-                <Route path="/my-teams" element={<Page type='my-teams' />} />
-                {/* <Route path="/my-teams/:name" element={<Page type='my-teams' />} /> */}
+                <Route path="/teams" element={<Page type='teams' currentUser={currentUser} />} />
+                <Route path="/teams/:id" element={<Page type='team-details' currentUser={currentUser}/>} />
+                <Route path="/teams/:id/edit" element={<EditTeam currentUser={currentUser} />} />
+                <Route path="/teams/:id/delete" element={<DeleteTeam currentUser={currentUser} />} />
+                <Route path="/teams/new" element={<Page type='new-team' currentUser={currentUser}/>} />
+                <Route path="/my-teams" element={<Page type='my-teams' currentUser={currentUser}/>} />
               </Fragment>
             )}
 
             <Route path="/pokemon" element={<Page type='pokemon' />} />
-            <Route path="/pokemon/:id" element={<Page type='pokemon-detail' />} />
+            {/* <Route path="/pokemon/:id" element={<Page type='pokemon-detail' />} /> */}
 
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>

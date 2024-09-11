@@ -3,8 +3,9 @@ import { Card, CardBody, CardTitle } from "reactstrap";
 
 
 /**
- * Home 
- * The basic Home page component.
+ * Home - The basic Home page component.
+ * 
+ * @returns {JSX.Element} - Rendered Home page component with a welcome message
  */
 export default function Home() {
 

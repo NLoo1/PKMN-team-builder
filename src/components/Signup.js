@@ -2,7 +2,16 @@ import React, { useState } from "react";
 import { Card, CardBody, CardTitle } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 
-
+/**
+ * SignupUser - Component for rendering a sign-up form for new users.
+ * Allows users to create a new account by providing a username, email, and password.
+ * Handles form validation and submission, and provides feedback on errors.
+ * 
+ * @param {Object} props - The props for the component.
+ * @param {Function} props.addUser - Function to handle adding a new user.
+ * 
+ * @returns {JSX.Element} - Rendered sign-up form with validation and error handling.
+ */
 const SignupUser = ({ addUser }) => {
   const INITIAL_STATE = {
     username: '',
@@ -12,6 +21,7 @@ const SignupUser = ({ addUser }) => {
   };
 
   const [formData, setFormData] = useState(INITIAL_STATE);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -31,26 +41,23 @@ const SignupUser = ({ addUser }) => {
       formData.password.trim() === '' ||
       formData.email.trim() === ''
     ) {
-      alert("Please fill out all fields");
+      setError("Please fill out all fields.");
       return;
     } 
 
-    if(formData.password !== formData.confirmPassword){
-      alert('Passwords do not match')
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
       return;
     }
   
     // Call addUser with form data
     try {
       await addUser(formData);
-      // window.location.href = '/'
-      navigate('/')
       setFormData(INITIAL_STATE); // Clear form after successful submission
-      
+      navigate('/'); // Redirect to homepage
     } catch (error) {
       console.error("Error adding user:", error);
-      // Handle error appropriately (e.g., show error message)
-      alert("Failed to register user");
+      setError("Failed to register user.");
     }
   };
 
@@ -58,7 +65,7 @@ const SignupUser = ({ addUser }) => {
     <Card>
       <CardBody>
         <CardTitle><h1>Sign up here:</h1></CardTitle>
-
+        {error && <div className="alert alert-danger">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group p-2">
             <label htmlFor="username">Username: </label>
@@ -96,7 +103,7 @@ const SignupUser = ({ addUser }) => {
               value={formData.password}
               onChange={handleChange}
               className='form-control'
-              autoComplete="true"
+              autoComplete="new-password"
             />
           </div>
 
@@ -110,8 +117,7 @@ const SignupUser = ({ addUser }) => {
               value={formData.confirmPassword}
               onChange={handleChange}
               className='form-control'
-              autoComplete="true"
-
+              autoComplete="new-password"
             />
           </div>
 

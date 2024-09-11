@@ -6,19 +6,26 @@ import useFetchItems from '../hooks/useFetchItems';
 import Item from '../components/Item';
 
 /**
- * For editing an existing team with prefilled team name and selectable Pokémon.
- * @description Allows users to edit the team name and select up to 6 Pokémon.
- * @requires token - user should be logged in
+ * EditTeam - Component for editing an existing team with options to update the team name 
+ * and select up to 6 Pokémon from a list. Ensures that only the team owner or an admin 
+ * can perform edits. Handles Pokémon selection and form submission to update the team.
+ * 
+ * @param {Object} props - The props for the component.
+ * @param {Object} props.currentUser - The currently logged-in user object.
+ * @param {string} props.token - Authentication token used for API requests.
+ * 
+ * @returns {JSX.Element} - Rendered EditTeam component with form for updating the team name, 
+ *                           selectable Pokémon list, and "Load More" functionality for the Pokémon list.
  */
-export function EditTeam() {
+export function EditTeam({ currentUser, token }) {
   const [selectedPokemon, setSelectedPokemon] = useState(new Set());
   const [formData, setFormData] = useState({ teamName: "" });
   const [offset, setOffset] = useState(0);
   const [loadMoreCount] = useState(20);
-  const [isSearching, setIsSearching] = useState(false);
   const { id } = useParams(); // Get team ID from URL params
+  const [teamOwnerId, setTeamOwnerId] = useState(null);
 
-  const { data, isLoading, getItems } = useFetchItems("new-team", offset, loadMoreCount);
+  const { data, getItems } = useFetchItems("new-team", offset, loadMoreCount);
 
   // Fetch Pokémon list and team data
   useEffect(() => {
@@ -28,21 +35,31 @@ export function EditTeam() {
         await getItems();
         
         // Fetch existing team data
-        const teamData = await PokeAPI.getTeamById(id, localStorage.token);
-        const { team_name } = teamData;
-
-        // const teamPokemon = await PokeAPI.getAllPokemonInTeam(id, localStorage.token);
+        const teamData = await PokeAPI.getTeamById(id, token);
+        const { team_name, user_id } = teamData;
+        
+        // Fetch the owner ID
+        setTeamOwnerId(user_id);
 
         // Set the team name and pre-select Pokémon
         setFormData({ teamName: team_name });
-        // setSelectedPokemon(new Set(teamPokemon.map(p => ({ id: p.pokemon_id, name: p.pokemon_name }))));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, [id, getItems]);
+  }, [id, getItems, token]);
+
+  // Check if the current user is the owner or an admin
+  useEffect(() => {
+    if (teamOwnerId && currentUser) {
+      if (teamOwnerId !== currentUser.user_id && currentUser.isAdmin === 'false') {
+        alert("You do not have permission to edit this team.");
+        window.history.back(); 
+      }
+    }
+  }, [teamOwnerId, currentUser]);
 
   // Handle Pokémon selection changes
   const handleCheckboxChange = (pokemon) => {
@@ -80,8 +97,6 @@ export function EditTeam() {
     }
 
     try {
-      const user = await PokeAPI.getUser(localStorage.user, localStorage.token);
-
       // Prepare the selected Pokémon for the API request
       const pokemonToAdd = Array.from(selectedPokemon).map(p => ({
         pokemon_id: p.id,
@@ -90,9 +105,9 @@ export function EditTeam() {
 
       await PokeAPI.updateTeam(id, {
         team_name: formData.teamName || "Updated Team",
-        user_id: user.user.user_id,
+        user_id: currentUser.user_id,
         pokemon: pokemonToAdd,
-      }, localStorage.token);
+      }, token);
 
       alert("Team updated successfully!");
       setSelectedPokemon(new Set()); // Reset after update
@@ -157,7 +172,7 @@ export function EditTeam() {
         </tbody>
       </table>
 
-      {!isSearching && (
+      {data.length >= loadMoreCount && (
         <button
           onClick={handleLoadMore}
           className="btn btn-primary mx-auto d-block"

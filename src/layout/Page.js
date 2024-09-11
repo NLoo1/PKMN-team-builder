@@ -9,10 +9,19 @@ import '../styles/Page.css';
 
 
 /**
- * Generic Page component to display basic banner card. 
- * Renders different components depending on passed 'type' prop
+ * Page - Generic component to display a basic banner card and render different content 
+ * based on the provided 'type' prop.
+ * 
+ * @param {Object} props - The props for the component.
+ * @param {string} props.type - The type of content to display, which determines 
+ *                               the component to render.
+ * @param {Object} [props.currentUser] - The current user object, optional prop used 
+ *                                       by some content components.
+ * 
+ * @returns {JSX.Element} - Rendered Page component with a banner and the appropriate 
+ *                           content based on the 'type' prop.
  */
-export default function Page({ type }) {
+export default function Page({ type,currentUser }) {
   let ContentComponent;
   let title;
 
@@ -61,7 +70,7 @@ export default function Page({ type }) {
       <hr />
       
       {/* Render the specific component based on type */}
-      <ContentComponent />
+      <ContentComponent currentUser={currentUser} />
     </div>
   );
 }

@@ -1,74 +1,100 @@
-import '../styles/List.css'; 
+import "../styles/List.css";
 import { Card, CardBody, CardTitle } from "reactstrap";
-import PokeAPI from '../services/api'; 
-import { useState, useEffect } from "react";
+import PokeAPI from "../services/api";
+import { useState, useEffect, Fragment } from "react";
 import { useParams, Link } from "react-router-dom";
 
-
 /**
- * Team
- * Component for rendering a team. Allows for editing and deletion depending on permissions.
+ * Team - Component for rendering a team. Displays team details, including Pokémon 
+ * in the team, and allows for editing and deletion based on permissions.
+ * 
+ * @param {Object} props - The props for the component.
+ * @param {string} props.token - Authentication token used for API requests.
+ * @param {Function} props.editTeam - Function to handle team editing.
+ * @param {Function} props.deleteTeam - Function to handle team deletion.
+ * @param {Object} [props.currentUser] - The current user object, optional prop used 
+ *                                       for permission checks.
+ * 
+ * @returns {JSX.Element} - Rendered Team component with team details and action buttons 
+ *                           (edit and delete) based on user permissions.
  */
-export function Team({ token, editTeam, deleteTeam }) {
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [teamData, setTeamData] = useState([]);
-    const [teamName, setTeamName] = useState("New Team")
-    const params = useParams();
+export function Team({ token, editTeam, deleteTeam, currentUser }) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [teamData, setTeamData] = useState([]);
+  const [teamName, setTeamName] = useState("New Team");
+  const params = useParams();
 
-    useEffect(() => {
-        async function fetchTeamData() {
-            try {
-                const resp = await PokeAPI.getAllPokemonInTeam(params.id, localStorage.token);
-                const name = await PokeAPI.getTeamById(params.id, localStorage.token)
-                setTeamData(resp);  
-                setTeamName(name)
-                setIsLoaded(true);
-            } catch (err) {
-                console.error("Error fetching team data:", err);
-            }
-        }
-        fetchTeamData();
-    }, [params.id]);
+  useEffect(() => {
+    async function fetchTeamData() {
+      try {
+        const resp = await PokeAPI.getAllPokemonInTeam(params.id);
+        const name = await PokeAPI.getTeamById(params.id);
+        setTeamData(resp);
+        setTeamName(name);
+        setIsLoaded(true);
+      } catch (err) {
+        console.error("Error fetching team data:", err);
+      }
+    }
+    fetchTeamData();
+  }, [params.id]);
 
-    return (
-        <section className='content'>
-            {isLoaded && teamData.length > 0 ? (
-                <section>
-                    <Card>
-                        <CardTitle><h1>
-                            {teamName.team_name}</h1></CardTitle>
-                        <CardBody>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Position</th>
-                                        <th>Sprite</th>
-                                        <th>Pokemon</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {teamData.map((pkmn, index) => (
-                                        <tr key={index}>
-                                            <td>{pkmn.position}</td>
-                                            <td>
-                                                <img 
-                                                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pkmn.pokemon_id}.png`} 
-                                                    alt={pkmn.pokemon_name}
-                                                />
-                                            </td>
-                                            <td>{pkmn.pokemon_name[0].toUpperCase() + pkmn.pokemon_name.slice(1)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                            <Link to={`/teams/${params.id}/delete`}><button className='btn btn-danger my-2'>Delete team</button></Link>
-                            <Link to={`/teams/${params.id}/edit`}><button className='btn btn-primary my-2 mx-1'>Edit team</button></Link>
-                        </CardBody>
-                    </Card>
-                </section>
-            ) : (
-                <section>Loading...</section>
-            )}
+  return (
+    <section className="content">
+      {isLoaded && teamData.length > 0 ? (
+        <section>
+          <Card>
+            <CardTitle>
+              <h1>{teamName.team_name}</h1>
+            </CardTitle>
+            <CardBody>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Position</th>
+                    <th>Sprite</th>
+                    <th>Pokemon</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teamData.map((pkmn, index) => (
+                    <tr key={index}>
+                      <td>{pkmn.position}</td>
+                      <td>
+                        <img
+                          src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pkmn.pokemon_id}.png`}
+                          alt={pkmn.pokemon_name}
+                        />
+                      </td>
+                      <td>
+                        {pkmn.pokemon_name[0].toUpperCase() +
+                          pkmn.pokemon_name.slice(1)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {(currentUser && 
+  (localStorage.isAdmin === "true" || localStorage.id === teamData.user_id)) && (
+  <Fragment>
+    <Link to={`/teams/${params.id}/delete`}>
+      <button className="btn btn-danger my-2">Delete team</button>
+    </Link>
+    <Link to={`/teams/${params.id}/edit`}>
+      <button className="btn btn-primary my-2 mx-1">
+        Edit team
+      </button>
+    </Link>
+  </Fragment>
+)}
+
+            </CardBody>
+          </Card>
         </section>
-    );
+      ) : (
+        <section>Loading...</section>
+      )}
+    </section>
+  );
 }

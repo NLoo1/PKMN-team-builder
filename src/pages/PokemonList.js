@@ -1,10 +1,14 @@
 import '../styles/List.css';
 import React, { useState } from "react";
 import useFetchItems from '../hooks/useFetchItems';
-import Search from '../components/Search';
+import {Search} from '../components/Search';
 import Item from '../components/Item';
 
-
+/**
+ * PokemonList displays a paginated list of Pokémon with search and load more functionality.
+ * 
+ * @returns {JSX.Element} - Rendered PokemonList component
+ */
 export function PokemonList() {
   const [offset, setOffset] = useState(0);
   const [loadMoreCount, setLoadMoreCount] = useState(20);
@@ -33,6 +37,7 @@ export function PokemonList() {
         />
       </div>
 
+
       <div className="table-container">
         <table className="table">
           <thead>
@@ -47,9 +52,13 @@ export function PokemonList() {
             ))}
           </tbody>
         </table>
+
+        {isSearching === 'false' &&
         <button onClick={handleLoadMore} className="btn btn-primary mx-auto d-block">
-          Load More
-        </button>
+        Load More
+      </button>
+        }
+        
       </div>
     </section>
   );

@@ -2,10 +2,14 @@
 import '../styles/List.css';  
 import React, { useState } from "react";
 import useFetchItems from '../hooks/useFetchItems'; 
-import Search from '../components/Search';  
+import {Search} from '../components/Search';  
 import Item from '../components/Item';  
 
-
+/**
+ * UserList displays a paginated list of users with search and load more functionality.
+ * 
+ * @returns {JSX.Element} - Rendered UserList component
+ */
 export function UserList() {
   const [offset, setOffset] = useState(0);
   const [loadMoreCount, setLoadMoreCount] = useState(20);
@@ -47,9 +51,12 @@ export function UserList() {
             ))}
           </tbody>
         </table>
+        {isSearching === 'false' &&
         <button onClick={handleLoadMore} className="btn btn-primary mx-auto d-block">
-          Load More
-        </button>
+        Load More
+      </button>
+        }
+        
       </div>
     </section>
   );
