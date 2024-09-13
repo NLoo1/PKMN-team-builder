@@ -21,6 +21,8 @@ import { Link } from "react-router-dom";
  */
 export function Item({ data, type, isSelectable, isSelected, onCheckboxChange}) {
   const [imageUrl, setImageUrl] = useState("");
+
+  // console.log(data)
   
 
   useEffect(() => {

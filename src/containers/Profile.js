@@ -106,7 +106,10 @@ export function Profile({ currentUser, token, editUser, deleteUser }) {
                   </tr>
                 ))
                 :
-                <td>This user has no teams.</td>
+                <tr>
+                  <td>This user has no teams.
+                    </td>
+                    </tr>
                 }
                 {}
               </tbody>

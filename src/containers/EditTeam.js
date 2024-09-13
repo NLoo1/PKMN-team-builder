@@ -67,21 +67,28 @@ export function EditTeam({ currentUser, token }) {
 
   // Handle Pokémon selection changes
   const handleCheckboxChange = (pokemon) => {
-    setSelectedPokemon(prevSelected => {
+    setSelectedPokemon((prevSelected) => {
       const newSelected = new Set(prevSelected);
-      const isSelected = Array.from(newSelected).some(p => p.id === pokemon.id);
-
-      if (isSelected) {
-        newSelected.delete(pokemon);
+  
+      // Construct Pokémon object with correct properties
+      const pokemonObject = {
+        id: pokemon.id,
+        name: pokemon.name,
+      };
+  
+      // Check if the Pokémon is already selected
+      if (newSelected.has(pokemonObject.id)) {
+        newSelected.delete(pokemonObject.id); // Remove Pokémon
       } else if (newSelected.size < 6) {
-        newSelected.add(pokemon);
+        newSelected.add(pokemonObject.id); // Add Pokémon if less than 6 are selected
       } else {
-        alert("Up to 6 Pokémon may be added.");
+        alert("You can only add up to 6 Pokémon to a team.");
       }
-
+  
       return newSelected;
     });
   };
+  
 
   // Handle form data changes
   const handleChange = (e) => {
@@ -168,13 +175,13 @@ export function EditTeam({ currentUser, token }) {
         <tbody>
           {data.map((pokemon) => (
             <Item
-              key={pokemon.id}
-              data={pokemon}
-              type="pokemon"
-              isSelectable={true}
-              isSelected={Array.from(selectedPokemon).some(p => p.id === pokemon.id)}
-              onCheckboxChange={() => handleCheckboxChange(pokemon)}
-            />
+            key={pokemon.id} // Use the ID or fallback to the index
+            data={pokemon}
+            type="pokemon"
+            isSelectable={true}
+            isSelected={selectedPokemon.has(pokemon.name)}
+            onCheckboxChange={() => handleCheckboxChange(pokemon)}
+          />
           ))}
         </tbody>
       </table>

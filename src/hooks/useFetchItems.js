@@ -29,6 +29,7 @@ export default function useFetchItems(type, offset, loadMoreCount, currentUser) 
         case "new-team":
         case "pokemon":
           items = await PokeAPI.getAllPokemon(offset, loadMoreCount);
+          // console.log(items)
           break;
         case "users":
           items = await PokeAPI.getUsers(currentUser.token); // Use currentUser.token
@@ -47,11 +48,13 @@ export default function useFetchItems(type, offset, loadMoreCount, currentUser) 
       // Format Pokémon data
       if (type === "pokemon" || type === "new-team") {
         items = items.map(pokemon => ({
-          pokemon_id: pokemon.id,
-          pokemon_name: pokemon.name,
+          pokemon_id: items.indexOf(pokemon)+offset+1, 
+          name: pokemon.name,
           ...pokemon
         }));
       }
+
+      // console.log(items)
 
       // Update state with fetched data
       setData(prevData => [...prevData, ...items.sort((a, b) => a.pokemon_id - b.pokemon_id)]);

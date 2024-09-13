@@ -176,14 +176,17 @@ export function NewTeam({currentUser}) {
 
   // Handle checkbox changes
   const handleCheckboxChange = (pokemon) => {
+    console.log(pokemon)
     setSelectedPokemon((prevSelected) => {
       const newSelected = new Set(prevSelected);
 
       // Check if the Pokémon is already selected based on its ID
-      if (newSelected.has(pokemon.id)) {
-        newSelected.delete(pokemon.id); // Remove Pokémon
+      if (newSelected.has(pokemon)) {
+        newSelected.delete(pokemon); // Remove Pokémon
+        // pokemon.isSelected = false;
       } else if (newSelected.size < 6) {
-        newSelected.add(pokemon.id); // Add Pokémon if less than 6 are selected
+        newSelected.add(pokemon); // Add Pokémon if less than 6 are selected
+        // pokemon.isSelected = true;
       } else {
         alert("You can only add up to 6 Pokémon to a team.");
       }
@@ -209,44 +212,55 @@ export function NewTeam({currentUser}) {
       alert("Please select at least one Pokémon to create a team.");
       return;
     }
-
+  
     try {
-      const user = await PokeAPI.getUser(localStorage.user, localStorage.token);
 
+      console.log(currentUser)
+      const user = await PokeAPI.getUser(currentUser.currentUser.username, currentUser.token);
+  
       // Create team
       const team = await PokeAPI.createTeam(
         {
           team_name: formData.teamName || "New Team",
           user_id: user.user.user_id,
         },
-        localStorage.token
+        currentUser.token
       );
-
+  
       const team_id = team.team.team_id;
 
-      // Prepare an array of Pokémon IDs
+      // TODO: fix pokemontoadd to correctly map from set of SelectedPokemon
+  
+      // Prepare an array of Pokémon objects with required properties
       const pokemonToAdd = Array.from(selectedPokemon).map((pokemon_id) => ({
-        pokemon_id,
+        pokemon_id: pokemon_id, // Ensure this is an integer
+        pokemon_name: data.find(pokemon => pokemon.id === pokemon_id).name, // Fetch the name based on id
       }));
 
+      console.log(pokemonToAdd)
+  
       // Populate teams_pokemon
       await PokeAPI.addPokemonToTeam(
         team_id,
+
+        // Data --> requires {user_id, team_id, pokemon}
         {
+          user_id: user.user.user_id,
           team_id,
           pokemon: pokemonToAdd,
         },
-        localStorage.token
+        currentUser.token
       );
-
+  
       alert("Team created successfully!");
       setSelectedPokemon(new Set()); // Reset selected Pokémon
     } catch (error) {
       console.error("Error creating team:", error);
-      setError(error)
+      setError(error);
       alert("Failed to create team.");
     }
   };
+  
 
   return (
     <section className="content">
@@ -299,7 +313,7 @@ export function NewTeam({currentUser}) {
               data={pokemon}
               type="pokemon"
               isSelectable={true}
-              isSelected={selectedPokemon.has(pokemon.id)}
+              isSelected={selectedPokemon.has(pokemon)}
               onCheckboxChange={() => handleCheckboxChange(pokemon)}
             />
           ))}
