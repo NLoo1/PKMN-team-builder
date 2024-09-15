@@ -230,12 +230,18 @@ export function NewTeam({currentUser}) {
       const team_id = team.team.team_id;
 
       // TODO: fix pokemontoadd to correctly map from set of SelectedPokemon
-  
+
+      // This is looking for an Array of objects
+      // each object has pokemon_name, pokemon_id, position, nickname
+
       // Prepare an array of Pokémon objects with required properties
-      const pokemonToAdd = Array.from(selectedPokemon).map((pokemon_id) => ({
-        pokemon_id: pokemon_id, // Ensure this is an integer
-        pokemon_name: data.find(pokemon => pokemon.id === pokemon_id).name, // Fetch the name based on id
+      const pokemonToAdd = Array.from(selectedPokemon).map((pokemon, index) => ({
+        pokemon_id: pokemon.pokemon_id, // Access pokemon_id directly from the object
+        pokemon_name: pokemon.name, // Access the name directly
+        position: index + 1 // Add 1 to the index to make position start from 1
       }));
+      
+      
 
       console.log(pokemonToAdd)
   

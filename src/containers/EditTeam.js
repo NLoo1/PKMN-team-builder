@@ -67,24 +67,22 @@ export function EditTeam({ currentUser, token }) {
 
   // Handle Pokémon selection changes
   const handleCheckboxChange = (pokemon) => {
+    console.log(pokemon)
     setSelectedPokemon((prevSelected) => {
       const newSelected = new Set(prevSelected);
-  
-      // Construct Pokémon object with correct properties
-      const pokemonObject = {
-        id: pokemon.id,
-        name: pokemon.name,
-      };
-  
-      // Check if the Pokémon is already selected
-      if (newSelected.has(pokemonObject.id)) {
-        newSelected.delete(pokemonObject.id); // Remove Pokémon
+
+      // Check if the Pokémon is already selected based on its ID
+      if (newSelected.has(pokemon)) {
+        newSelected.delete(pokemon); // Remove Pokémon
+        // pokemon.isSelected = false;
       } else if (newSelected.size < 6) {
-        newSelected.add(pokemonObject.id); // Add Pokémon if less than 6 are selected
+        newSelected.add(pokemon); // Add Pokémon if less than 6 are selected
+        // pokemon.isSelected = true;
       } else {
         alert("You can only add up to 6 Pokémon to a team.");
       }
-  
+
+      console.log(newSelected);
       return newSelected;
     });
   };
@@ -103,29 +101,47 @@ export function EditTeam({ currentUser, token }) {
   const handleUpdateTeam = async (e) => {
     e.preventDefault();
     if (selectedPokemon.size === 0) {
-      alert("Please select at least one Pokémon to update the team.");
+      alert("Please select at least one Pokémon to create a team.");
       return;
     }
-
+  
     try {
-      // Prepare the selected Pokémon for the API request
-      const pokemonToAdd = Array.from(selectedPokemon).map(p => ({
-        pokemon_id: p.id,
-        pokemon_name: p.name,
+
+      console.log(currentUser)
+      const user = await PokeAPI.getUser(currentUser.username, currentUser.token);
+
+      const team_id = id
+      console.log(team_id)
+
+      // Prepare an array of Pokémon objects with required properties
+      const pokemonToAdd = Array.from(selectedPokemon).map((pokemon, index) => ({
+        pokemon_id: pokemon.pokemon_id, // Access pokemon_id directly from the object
+        pokemon_name: pokemon.name, // Access the name directly
+        position: index + 1 // Add 1 to the index to make position start from 1
       }));
+      
+      
 
-      await PokeAPI.updateTeam(id, {
-        team_name: formData.teamName || "Updated Team",
-        user_id: currentUser.user_id,
-        pokemon: pokemonToAdd,
-      }, token);
-
-      alert("Team updated successfully!");
-      setSelectedPokemon(new Set()); // Reset after update
+      console.log(pokemonToAdd)
+  
+      // teamPokemonId, data, token
+      await PokeAPI.editPokemonInTeam(
+        team_id,
+        {
+          user_id: user.user.user_id,
+          team_id: team_id,
+          pokemon: pokemonToAdd,
+        },
+        currentUser.token
+      );
+      
+  
+      alert("Team edited successfully!");
+      setSelectedPokemon(new Set()); // Reset selected Pokémon
     } catch (error) {
-      console.error("Error updating team:", error);
-      setError(error)
-      alert("Failed to update team.");
+      console.error("Error editing team:", error);
+      setError(error);
+      alert("Failed to edit team.");
     }
   };
 
@@ -173,16 +189,16 @@ export function EditTeam({ currentUser, token }) {
           </tr>
         </thead>
         <tbody>
-          {data.map((pokemon) => (
+        {data.map((pokemon, i) => (
             <Item
-            key={pokemon.id} // Use the ID or fallback to the index
-            data={pokemon}
-            type="pokemon"
-            isSelectable={true}
-            isSelected={selectedPokemon.has(pokemon.name)}
-            onCheckboxChange={() => handleCheckboxChange(pokemon)}
-          />
-          ))}
+              key={pokemon.id || i} // Use the ID or fallback to the index
+              data={pokemon}
+              type="pokemon"
+              isSelectable={true}
+              isSelected={selectedPokemon.has(pokemon)}
+              onCheckboxChange={() => handleCheckboxChange(pokemon)}
+            />
+        ))}
         </tbody>
       </table>
 

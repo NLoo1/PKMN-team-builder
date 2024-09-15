@@ -339,7 +339,7 @@ static async addPokemonToTeam(id, data, token) {
 
     const response = await this.request(
       `pokemon-teams/${id}`,
-      { user_id: data.user_id, team_id: data.team_id, pokemon: formattedPokemon },
+      { user_id: data.user_id, team_id:data.team_id, pokemon: formattedPokemon },
       'post',
       token
     );
@@ -349,6 +349,42 @@ static async addPokemonToTeam(id, data, token) {
     console.error("Add Pokemon to Team Error:", error);
   }
 }
+
+/**
+ * Updates Pokémon details in a specific team.
+ * 
+ * @param {number} teamId - The ID of the team where Pokémon are being updated.
+ * @param {Object} data - An object containing fields to update, including `user_id`, `team_id`, and an array of `pokemon` details.
+ * @param {string} token - The authentication token for the API request.
+ * @returns {Object} The updated Pokémon details within the team.
+ * @throws {Error} if the request fails or an error occurs.
+ */
+static async editPokemonInTeam(teamId, data, token) {
+  try {
+    // Format Pokémon data for the API request
+    const formattedPokemon = data.pokemon.map((poke, index) => ({
+      pokemon_id: poke.pokemon_id,
+      pokemon_name: poke.pokemon_name,
+      position: index + 1,
+      nickname: poke.nickname || ""
+    }));
+
+    // Make the API request to update Pokémon in the team
+    const response = await this.request(
+      `pokemon-teams/${teamId}`,
+      { user_id: data.user_id, team_id: parseInt(data.team_id), pokemon: formattedPokemon },
+      'patch', 
+      token
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Edit Pokémon in Team Error:", error);
+    throw new Error("Failed to update Pokémon in the team.");
+  }
+}
+
+
 
 
 /**
@@ -474,9 +510,5 @@ static async deleteUserTeam(id, token) {
 
 
 }
-// For now, put token ("testuser" / "password" on class)
-PokeAPI.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZ" +
-  "SI6InRlc3R1c2VyIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTU5ODE1OTI1OX0." +
-  "FtrMwBQwe6Ue-glIFgz_Nf8XxRT2YecFCiSpYL0fCXc";
 
 export default PokeAPI;

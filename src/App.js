@@ -21,7 +21,7 @@ import {EditTeam} from './containers/EditTeam';
  */
 function App() {
   // Keep track of current user. If there is no local storage (the user is logged out), just set to null
-  const [currentUser, setCurrentUser] = useState({username: localStorage.user, isAdmin: localStorage.isAdmin, user_id: localStorage.id, token: localStorage.token }|| null);
+  const [currentUser, setCurrentUser] = useState(localStorage.user ? {username: localStorage.user, isAdmin: localStorage.isAdmin, user_id: localStorage.id, token: localStorage.token } : null);
   const [token, setToken] = useState(localStorage.token || null);
 
   /**
@@ -45,6 +45,7 @@ function App() {
       localStorage.token = resp.token;
       localStorage.isAdmin = resp.isAdmin;
       localStorage.id = resp.id
+      PokeAPI.token = resp.token
 
       console.log(`Successfully registered ${resp.username}!`);
     } catch (error) {
@@ -71,6 +72,7 @@ function App() {
       localStorage.id = resp.id
       localStorage.token = resp.token;
       localStorage.isAdmin = resp.isAdmin;
+      PokeAPI.token = resp.token
     } catch (e) {
       console.error("Could not login: " + e);
       throw Error(e)
@@ -114,6 +116,7 @@ async function editUser(user, username) {
       // Re-authenticate and update the token if the current user edited their own profile
       const newTokenResp = PokeAPI.login(user.username, user.password);
       localStorage.token = newTokenResp.token;
+      PokeAPI.token = newTokenResp.token
       
       setToken(newTokenResp.token);
       setCurrentUser({username: newTokenResp.username, 
