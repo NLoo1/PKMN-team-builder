@@ -10,7 +10,7 @@ import {Profile} from './containers/Profile';
 import DeleteUser from './components/DeleteUser';
 import Page from './layout/Page';
 import EditUser from './containers/EditProfile';
-// import axios from 'axios';
+import React from "react";
 import DeleteTeam from './components/DeleteTeam';
 import {EditTeam} from './containers/EditTeam';
 

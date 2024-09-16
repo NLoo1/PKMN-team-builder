@@ -4,8 +4,6 @@
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.2",
     "axios-throttle": "^1.0.2",
     "bootstrap": "^5.3.3",
@@ -17,7 +15,18 @@
     "reactstrap": "^9.2.2",
     "web-vitals": "^2.1.4"
   },
-  "devDependencies": {"@babel/plugin-proposal-private-property-in-object": "*"},
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/plugin-proposal-private-property-in-object": "*",
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-react": "^7.24.7",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "babel-jest": "^29.7.0",
+    "esm": "^3.2.25",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^27.5.1"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
