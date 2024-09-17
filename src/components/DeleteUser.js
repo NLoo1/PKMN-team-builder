@@ -23,8 +23,8 @@ const DeleteUser = ({ deleteUser, token, currentUser }) => {
 
   useEffect(() => {
     const getProfile = async () => {
-      // Check if currentUser matches params.username or if the user is an admin
-      if (currentUser.username !== params.username && localStorage.isAdmin !== 'true') {
+      // Ensure currentUser is defined before checking properties
+      if (currentUser && currentUser.username !== params.username && localStorage.isAdmin !== 'true') {
         alert("You are not authorized to delete this user.");
         navigate('/');
       }

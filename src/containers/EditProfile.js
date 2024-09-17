@@ -53,8 +53,7 @@ const EditUser = ({ editUser, token, currentUser }) => {
         setIsAdmin(resp.user.isAdmin);
       } catch (error) {
         console.error("Error fetching user data:", error);
-        setError(error)
-        alert("Failed to fetch user data.");
+        setError(error.message || "Failed to fetch user data.");
       }
     }
     getProfile();
@@ -79,12 +78,12 @@ const EditUser = ({ editUser, token, currentUser }) => {
       formData.password.trim() === '' ||
       formData.confirmPassword.trim() === ''
     ) {
-      alert("Please fill out all fields");
+      setError("Please fill out all fields");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
 
@@ -94,15 +93,14 @@ const EditUser = ({ editUser, token, currentUser }) => {
       navigate('/');
     } catch (error) {
       console.error("Error editing user:", error);
-      setError(error)
-      alert("Failed to edit user");
+      setError(error.message || "Failed to edit user");
     }
   };
 
   return (
     <Card>
       <CardBody>
-      {error && <div className="alert alert-danger">{error}</div>}
+        {error && <div className="alert alert-danger">{error}</div>}
         <CardTitle><h1>Change profile:</h1></CardTitle>
 
         <form onSubmit={handleSubmit}>

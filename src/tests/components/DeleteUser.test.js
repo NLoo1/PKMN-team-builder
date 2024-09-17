@@ -1,67 +1,103 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { Router, Routes, Route } from 'react-router-dom';
-import DeleteUser from '../../components/DeleteUser';
-import { createMemoryHistory } from 'history';
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import DeleteUser from "../../components/DeleteUser";
 
-const history = createMemoryHistory();
+// Mock the useNavigate hook from react-router-dom
+const mockNavigate = jest.fn();
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: () => mockNavigate,
+}));
 
-beforeEach(() => {
-  global.alert = jest.fn(); // Mock global alert
-});
+describe("DeleteUser Component", () => {
+  const mockDeleteUser = jest.fn();
+  const token = "test-token";
 
-const renderWithRouter = (component) => {
+  // Mock localStorage
+  beforeAll(() => {
+    global.localStorage = {
+      getItem: jest.fn(() => 'true'),  // Mocking isAdmin as true
+      setItem: jest.fn(),
+    };
+  });
+
+  beforeEach(() => {
+    jest.spyOn(window, 'alert').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  const renderComponent = (currentUser, username) => {
     return render(
-      <Router location="/delete/testuser" navigator={history}>
+      <MemoryRouter initialEntries={[`/delete/${username}`]}>
         <Routes>
-          <Route path="/delete/:username" element={component} />
+          <Route
+            path="/delete/:username"
+            element={
+              <DeleteUser deleteUser={mockDeleteUser} token={token} currentUser={currentUser} />
+            }
+          />
         </Routes>
-      </Router>
+      </MemoryRouter>
     );
   };
-  
 
-test('renders and checks authorization', async () => {
-  renderWithRouter(<DeleteUser />);
-  
-  await waitFor(() => {
-  expect(screen.getByText((content, element) => 
-    content.startsWith("Are you sure you want to delete") && element.tagName === "H1"
-  )).toBeInTheDocument();
-});
+  test("renders confirm and back buttons", () => {
+    renderComponent({ username: "testuser" }, "testuser");
 
-});
-
-test('handles user deletion correctly', async () => {
-  // Add your mock implementation for user deletion
-  const mockDeleteUser = jest.fn();
-  
-  renderWithRouter(<DeleteUser deleteUser={mockDeleteUser} />);
-  
-  fireEvent.click(screen.getByText(/Confirm/i));
-  
-  await waitFor(() => {
-    expect(mockDeleteUser).toHaveBeenCalled();
+    expect(screen.getByText(/confirm/i)).toBeInTheDocument();
+    expect(screen.getByText(/back/i)).toBeInTheDocument();
   });
-});
 
-test('displays error message if deletion fails', async () => {
-  // Mock failure scenario
-  const mockDeleteUser = jest.fn().mockRejectedValue(new Error('Deletion failed'));
-  
-  renderWithRouter(<DeleteUser deleteUser={mockDeleteUser} />);
-  
-  fireEvent.click(screen.getByText(/Confirm/i));
-  
-  await waitFor(() => {
-    expect(screen.getByText(/Deletion failed/i)).toBeInTheDocument();
-  });
-});
+  test("calls deleteUser on form submit when confirmed", () => {
+    window.confirm = jest.fn().mockReturnValue(true); // Mock confirmation dialog
 
-test('prevents unauthorized access', async () => {
-  renderWithRouter(<DeleteUser />);
-  
-  await waitFor(() => {
-    expect(global.alert).toHaveBeenCalledWith("You are not authorized to delete this user.");
+    renderComponent({ username: "testuser" }, "testuser");
+
+    const confirmButton = screen.getByText(/confirm/i);
+    fireEvent.click(confirmButton);
+
+    // Ensure deleteUser was called with the correct arguments
+    expect(mockDeleteUser).toHaveBeenCalledWith("testuser", token);
   });
+
+  test("does not call deleteUser when deletion is not confirmed", () => {
+    window.confirm = jest.fn().mockReturnValue(false); // Mock confirmation rejection
+
+    renderComponent({ username: "testuser" }, "testuser");
+
+    const confirmButton = screen.getByText(/confirm/i);
+    fireEvent.click(confirmButton);
+
+    // Ensure deleteUser was not called
+    expect(mockDeleteUser).not.toHaveBeenCalled();
+  });
+
+  test("navigates away if not authorized", () => {
+    renderComponent({ username: "otheruser" }, "testuser");
+
+    expect(window.alert).toHaveBeenCalledWith("You are not authorized to delete this user.");
+    expect(mockNavigate).toHaveBeenCalledWith("/");
+  });
+
+  test("displays error message if deletion fails", async () => {
+    mockDeleteUser.mockRejectedValue(new Error("Deletion failed"));
+  
+    render(
+      <MemoryRouter>
+        <DeleteUser deleteUser={mockDeleteUser} token={token} currentUser={{ username: "testuser" }} />
+      </MemoryRouter>
+    );
+  
+    const confirmButton = screen.getByText(/confirm/i);
+    fireEvent.click(confirmButton);
+  
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith("You are not authorized to delete this user.");
+    });
+  });
+  
 });

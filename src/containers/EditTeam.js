@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardBody, CardTitle } from "reactstrap";
 import { useParams } from "react-router-dom";
 import PokeAPI from '../services/api';
@@ -25,39 +25,39 @@ export function EditTeam({ currentUser, token }) {
   const { id } = useParams(); // Get team ID from URL params
   const [teamOwnerId, setTeamOwnerId] = useState(null);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState(''); // New state for success message
 
   const { data, getItems } = useFetchItems("new-team", offset, loadMoreCount);
 
   // Fetch Pokémon list and team data
   useEffect(() => {
+    if (!id) {
+      console.error("No team ID provided.");
+      return;
+    }
+  
     const fetchData = async () => {
       try {
-        // Fetch Pokémon list
         await getItems();
-        
-        // Fetch existing team data
         const teamData = await PokeAPI.getTeamById(id, token);
-        const { team_name, user_id } = teamData;
-        
-        // Fetch the owner ID
-        setTeamOwnerId(user_id);
+        const team_name = teamData?.team_name || "Default Team Name";
+const user_id = teamData?.user_id || null;
 
-        // Set the team name and pre-select Pokémon
+        setTeamOwnerId(user_id);
         setFormData({ teamName: team_name });
       } catch (error) {
         console.error("Error fetching data:", error);
-        setError(error)
+        setError("Failed to fetch team data");
       }
     };
-
+  
     fetchData();
   }, [id, getItems, token]);
+  
 
   // Check if the current user is the owner or an admin
   useEffect(() => {
     if (teamOwnerId && currentUser) {
-      console.log(teamOwnerId)
-      console.log(currentUser)
       if (teamOwnerId.toString() !== currentUser.user_id && currentUser.isAdmin === 'false') {
         alert("You do not have permission to edit this team.");
         window.history.back(); 
@@ -67,22 +67,18 @@ export function EditTeam({ currentUser, token }) {
 
   // Handle Pokémon selection changes
   const handleCheckboxChange = (pokemon) => {
-    console.log(pokemon)
     setSelectedPokemon((prevSelected) => {
       const newSelected = new Set(prevSelected);
 
       // Check if the Pokémon is already selected based on its ID
       if (newSelected.has(pokemon)) {
         newSelected.delete(pokemon); // Remove Pokémon
-        // pokemon.isSelected = false;
       } else if (newSelected.size < 6) {
         newSelected.add(pokemon); // Add Pokémon if less than 6 are selected
-        // pokemon.isSelected = true;
       } else {
         alert("You can only add up to 6 Pokémon to a team.");
       }
 
-      console.log(newSelected);
       return newSelected;
     });
   };
@@ -106,25 +102,16 @@ export function EditTeam({ currentUser, token }) {
     }
   
     try {
-
-      console.log(currentUser)
       const user = await PokeAPI.getUser(currentUser.username, currentUser.token);
-
-      const team_id = id
-      console.log(team_id)
+      const team_id = id;
 
       // Prepare an array of Pokémon objects with required properties
       const pokemonToAdd = Array.from(selectedPokemon).map((pokemon, index) => ({
-        pokemon_id: pokemon.pokemon_id, // Access pokemon_id directly from the object
-        pokemon_name: pokemon.name, // Access the name directly
-        position: index + 1 // Add 1 to the index to make position start from 1
+        pokemon_id: pokemon.pokemon_id,
+        pokemon_name: pokemon.name,
+        position: index + 1
       }));
-      
-      
 
-      console.log(pokemonToAdd)
-  
-      // teamPokemonId, data, token
       await PokeAPI.editPokemonInTeam(
         team_id,
         {
@@ -135,13 +122,11 @@ export function EditTeam({ currentUser, token }) {
         currentUser.token
       );
       
-  
-      alert("Team edited successfully!");
+      setSuccessMessage("Team edited successfully!"); // Set success message
       setSelectedPokemon(new Set()); // Reset selected Pokémon
     } catch (error) {
       console.error("Error editing team:", error);
-      setError(error);
-      alert("Failed to edit team.");
+      setError("Failed to edit team.");
     }
   };
 
@@ -155,7 +140,8 @@ export function EditTeam({ currentUser, token }) {
     <section className="content">
       <form className="form mb-2" onSubmit={handleUpdateTeam}>
         <Card>
-      {error && <div className="alert alert-danger">{error}</div>}
+          {error && <div className="alert alert-danger">{error}</div>}
+          {successMessage && <div className="alert alert-success">{successMessage}</div>} {/* Render success message */}
 
           <CardTitle>
             <label htmlFor="teamName">Edit team name:</label>
@@ -189,7 +175,7 @@ export function EditTeam({ currentUser, token }) {
           </tr>
         </thead>
         <tbody>
-        {data.map((pokemon, i) => (
+          {data.map((pokemon, i) => (
             <Item
               key={pokemon.id || i} // Use the ID or fallback to the index
               data={pokemon}
@@ -198,7 +184,7 @@ export function EditTeam({ currentUser, token }) {
               isSelected={selectedPokemon.has(pokemon)}
               onCheckboxChange={() => handleCheckboxChange(pokemon)}
             />
-        ))}
+          ))}
         </tbody>
       </table>
 
@@ -213,3 +199,5 @@ export function EditTeam({ currentUser, token }) {
     </section>
   );
 }
+
+export default EditTeam;
