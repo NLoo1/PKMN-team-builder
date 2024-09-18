@@ -5,12 +5,17 @@ import EditTeam from '../../containers/EditTeam';
 import PokeAPI from '../../services/api';
 import useFetchItems from '../../hooks/useFetchItems';
 
-// Mock the PokeAPI methods and the useFetchItems hook
-jest.mock('../../services/api', () => ({
-  getTeamById: jest.fn(),
-  editPokemonInTeam: jest.fn(),
-  getUser: jest.fn(),
-}));
+// Mock the PokeAPI class methods
+jest.mock('../../services/api', () => {
+  const mockApi = {
+    getTeamById: jest.fn(),
+    deleteTeam: jest.fn(),
+    getUser: jest.fn(),
+    getProfileTeams: jest.fn(),
+    editPokemonInTeam: jest.fn(),
+  };
+  return mockApi;
+});
 
 jest.mock('../../hooks/useFetchItems', () => ({
   __esModule: true,
@@ -39,8 +44,6 @@ describe('EditTeam Component', () => {
   afterEach(() => {
     jest.restoreAllMocks();
   });
-
-  // Removed the test for displaying success message
 
   it('handles Load More button click', async () => {
     const mockData = Array.from({ length: 20 }, (_, i) => ({ id: i + 1, name: `Pokemon ${i + 1}`, image: 'url' }));

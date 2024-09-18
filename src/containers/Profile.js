@@ -17,17 +17,17 @@ export function Profile({ currentUser, token, editUser, deleteUser }) {
     async function getProfile() {
       try {
         let resp;
-
+  
         if (location.pathname.includes("/profile")) {
           resp = await PokeAPI.getUser(currentUser.username, token);
         } else if (location.pathname.includes("/users")) {
           resp = await PokeAPI.getUser(params.username, token);
         }
-
-        if (!resp) {
+  
+        if (!resp || !resp.user) {
           throw new Error("No user data returned");
         }
-
+  
         setUserData(resp);
         const team = await PokeAPI.getProfileTeams(resp.user.username);
         setUserTeams(team);
@@ -35,12 +35,13 @@ export function Profile({ currentUser, token, editUser, deleteUser }) {
       } catch (error) {
         console.error("Error fetching user data:", error);
         setError(error.message || "Failed to fetch user data.");
-        setIsLoaded(true); // Ensure loading state is set to true even on error
+        setIsLoaded(true);
       }
     }
-
+  
     getProfile();
   }, [currentUser, location.pathname, params.username, token]);
+  
 
   return (
     <section>

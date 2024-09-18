@@ -1,3 +1,4 @@
+import React from "react";
 import "../styles/List.css";
 import { Card, CardBody, CardTitle } from "reactstrap";
 import PokeAPI from "../services/api";
@@ -43,7 +44,14 @@ export function Team({ token, editTeam, deleteTeam, currentUser }) {
 
   return (
     <section className="content">
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && (
+  <div className="error-message">
+    {error.message || 'An unknown error occurred'}
+  </div>
+)}
+
+
+
       {isLoaded && teamData.length > 0 ? (
         <section>
           <Card>
