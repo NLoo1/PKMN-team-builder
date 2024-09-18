@@ -77,7 +77,7 @@ function NavBar({ currentUser, logout }) {
           )}
 
           {/* Users */}
-          {currentUser?.isAdmin && location.pathname !== "/users" && (
+          {currentUser.isAdmin === 'true' && location.pathname !== "/users" && (
             <NavItem>
               <NavLink to='/users' className="nav-link">
                 Users

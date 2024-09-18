@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Home Component matches snapshot 1`] = `
+<DocumentFragment>
+  <section
+    class="col home"
+  >
+    <div
+      class="home card"
+    >
+      <div
+        class="text-center card-body"
+      >
+        <div
+          class="card-title"
+        >
+          <h3
+            class="font-weight-bold"
+          >
+            Welcome to Pokemon Team Builder!
+          </h3>
+        </div>
+      </div>
+    </div>
+  </section>
+</DocumentFragment>
+`;
