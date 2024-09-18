@@ -24,26 +24,25 @@ On initialization, `testadmin` is the only account with administrative privilege
 - The backend port defaults to **3001**.
 
 ## Setup & Installation
-1. Fork or clone this repository.
-2. You will see two folders:
-	- backend
-	- frontend
-	
-	For both of these folders, you will need to use a command-line shell to install required packages. I personally used Git Bash. 
+1. Fork or clone BOTH this repository and the backend.
+2. For both of these repos, you will need to use a command-line shell to install required packages. I personally used Git Bash.  
 3. Navigate to each folder and run `npm i`. 
-4. After installing required packages in each folder, navigate back to `backend`. In order to run the backend, you will need to use PostgreSQL to store user data.
+4. After installing required packages in each folder, navigate back to the backend. In order to run the backend, you will need to use PostgreSQL to store user data.
 5. In PostgreSQL, create a database called `pokeapi`. You may choose to name it whatever you want, but be sure to change `DB_NAME` in the next step accordingly.
-6. You'll need to create an `.env` file in `backend`. It should be formatted
+6. You'll need to create an `.env` file in the backend. It should be formatted
 `DB_USERNAME= `
 `DB_PASSWORD=`
 `DB_NAME=pokeapi`
 The .env file should have credentials for Express to access your database by itself and commit any transactions.
-1. In `backend`, run `psql -f pokeapi.sql` and press `Enter` or `Return`when prompted. This will create the required tables and schema for Pokemon Team Builder, while creating a `testuser`, `testadmin`, and `test-team` with Bulbasaur, Ivysaur, Charizard, Charmander, Charmeleon, and Charizard (the first 6 Pokemon).
+1. In the backend, run `psql -f pokeapi.sql` and press `Enter` or `Return`when prompted. This will create the required tables and schema for Pokemon Team Builder, while creating a `testuser`, `testadmin`, and `test-team` with Bulbasaur, Ivysaur, Charizard, Charmander, Charmeleon, and Charizard (the first 6 Pokemon).
 2. Open two CLI shells, one for the backend server and one for the frontend server. On one of the shells, route back to the backend folder and run `npm start`. Do the same with the shell for the frontend.
 3. Confirm there aren't any errors. If everything works as expected, your browser should automatically open up the home page.
 
 ##     Models
-Pokemon Team Builder's data is split between three tables: `User`, `Team`, and `teams_pokemon`. In the backend, a model and route for each table is given and actively used in the API. To see exactly how they are used, see `backend/app.js`.
+Pokemon Team Builder's data is split between three tables: `User`, `Team`, and `teams_pokemon`. In the backend, a model and route for each table is given and actively used in the API. 
+
+## Tests
+Run tests with `jest`. 
 
 ## Routes
 The team builder's frontend operates on these routes:
