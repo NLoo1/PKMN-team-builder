@@ -4,7 +4,7 @@ const mockApi = {
     getUser: jest.fn(),
     getProfileTeams: jest.fn(),
     editPokemonInTeam: jest.fn(),
-
+    getItems: jest.fn()
   };
   
   export default mockApi;

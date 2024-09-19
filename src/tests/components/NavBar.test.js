@@ -22,17 +22,14 @@ describe("NavBar Component", () => {
     
     // Check if Logout link is present
     expect(screen.getByText("Logout")).toBeInTheDocument();
-    
-
   });
 
   test("renders correctly for admin users", () => {
-    const currentUser = { username: "admin", isAdmin: true };
+    const currentUser = { username: "admin", isAdmin: 'true' }; // Checking isAdmin as string
     renderNavBar({ currentUser });
 
-    // Check if Admin Panel link is present
+    // Check if Users link is present for admin users
     expect(screen.getByText("Users")).toBeInTheDocument();
-
   });
 
   test("renders correctly for guests", () => {
