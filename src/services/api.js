@@ -23,7 +23,7 @@ class PokeAPI {
     // API related info will be logged for each request
 
     // Do NOT log data
-    console.debug("API Call:", endpoint, data, method);
+    console.debug("API Call:", endpoint, method);
     // console.debug("Token: " + token)
     const url = `${BASE_URL}/${endpoint}`;
     const headers = { Authorization: `Bearer ${token}` };
