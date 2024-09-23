@@ -92,7 +92,6 @@ function App() {
 
 // Edit user. Admin or same user only
 async function editUser(user, username) {
-
   try {
     // Make the API call to update the user's profile
     const resp = await PokeAPI.patchUser(
@@ -112,26 +111,40 @@ async function editUser(user, username) {
     // Check if the edited user is the same as the currently logged-in user
     if (localStorage.user === username) {
       // If the username has been changed, update it in local storage
-
-      // Re-authenticate and update the token if the current user edited their own profile
-      const newTokenResp = PokeAPI.login(user.username, user.password);
-      localStorage.token = newTokenResp.token;
-      PokeAPI.token = newTokenResp.token
-      
-      setToken(newTokenResp.token);
-      setCurrentUser({username: newTokenResp.username, 
-        isAdmin: newTokenResp.isAdmin, token: newTokenResp.token, 
-        user_id:newTokenResp.id});
-
-
-      console.log('Token updated successfully after username change.');
+      await updateUserToken(user);
     }
 
   } catch (e) {
     console.error(`Failed to edit user: ${e}`);
-    throw new Error(e)
+    throw new Error(e);
+  }
+
+  async function updateUserToken(user) {
+    try {
+      // Re-authenticate and update the token if the current user edited their own profile
+      const newTokenResp = await PokeAPI.login(user.username, user.password);
+      
+      // Update local storage and state
+      localStorage.user = user.username
+      localStorage.token = newTokenResp.token;
+      PokeAPI.token = newTokenResp.token;
+
+      setToken(newTokenResp.token);
+      setCurrentUser({
+        username: newTokenResp.username,
+        isAdmin: newTokenResp.isAdmin,
+        token: newTokenResp.token,
+        user_id: newTokenResp.id,
+      });
+
+      console.log('Token updated successfully after username change.');
+    } catch (e) {
+      console.error(`Failed to update token: ${e}`);
+      throw new Error(e);
+    }
   }
 }
+
 
 
   // Delete user. Only an admin or same user should be able to use this
@@ -141,7 +154,7 @@ async function editUser(user, username) {
         currentUser.token
       );
       console.log(`Successfully deleted ${username}!`);
-      logout()
+      if(currentUser.username === username) logout()
     } catch (e) {
       console.error(`Failed to delete user: ${e}`);
       throw new Error(e)
@@ -166,15 +179,15 @@ async function editUser(user, username) {
             <Route path="/" element={<Home />} />
 
             {/* If a user is an admin, show the hidden Users route */}
-            {localStorage.isAdmin === "true" && <Route path="/users" element={<Page type="users" />} />}
+            {(currentUser?.isAdmin || currentUser?.isAdmin === 'true') && <Route path="/users" element={<Page type="users" currentUser={currentUser}/>} />}
             
             {/* If the user isn't logged in, show the login and signup routes */}
             {currentUser == null ? (
               <Fragment>
                 <Route path="/login" element={<LoginUser login={login} />} />
                 <Route path="/signup" element={<SignupUser addUser={addUser} />} />
-                <Route path="/teams" element={<Page type='teams' />} />
-                <Route path="/teams/:id" element={<Page type='team-details' />} />
+                <Route path="/teams" element={<Page type='teams' currentUser={currentUser}/>} />
+                <Route path="/teams/:id" element={<Page type='team-details' currentUser={currentUser} />} />
 
 
               </Fragment>
@@ -196,7 +209,7 @@ async function editUser(user, username) {
               </Fragment>
             )}
 
-            <Route path="/pokemon" element={<Page type='pokemon' />} />
+            <Route path="/pokemon" element={<Page type='pokemon' currentUser={currentUser} />} />
             {/* <Route path="/pokemon/:id" element={<Page type='pokemon-detail' />} /> */}
 
             <Route path="*" element={<Navigate to="/" />} />

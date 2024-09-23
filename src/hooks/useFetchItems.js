@@ -32,6 +32,7 @@ export default function useFetchItems(type, offset, loadMoreCount, currentUser) 
           // console.log(items)
           break;
         case "users":
+          console.log(currentUser)
           items = await PokeAPI.getUsers(currentUser.token); // Use currentUser.token
           break;
         case "teams":

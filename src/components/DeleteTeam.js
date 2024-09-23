@@ -12,14 +12,13 @@ import PokeAPI from '../services/api';
  * 
  * @param {Object} props - The props object.
  * @param {Function} props.deleteTeam - Function to call for deleting a team.
- * @param {string} props.token - Authentication token used for API requests.
  * @param {Object} props.currentUser - The current logged-in user's information.
  * @param {string} props.currentUser.user_id - The ID of the current user.
  * @param {boolean} props.currentUser.isAdmin - Whether the current user is an admin.
  * 
  * @returns {JSX.Element} The rendered component.
  */
-const DeleteTeam = ({ deleteTeam, token, currentUser }) => {
+const DeleteTeam = ({ deleteTeam, currentUser }) => {
   const params = useParams();
   const [teamName, setTeamName] = useState('New Team');
   const [isLoaded, setIsLoaded] = useState(false);
@@ -29,7 +28,7 @@ const DeleteTeam = ({ deleteTeam, token, currentUser }) => {
     async function getTeam() {
       try {
         // Fetch team details
-        const resp = await PokeAPI.getTeamById(params.id, token);
+        const resp = await PokeAPI.getTeamById(params.id, currentUser.token);
 
         // Check if the current user is allowed to delete the team
         if ((resp.user_id !== currentUser.user_id) && !currentUser.isAdmin) {
@@ -48,13 +47,15 @@ const DeleteTeam = ({ deleteTeam, token, currentUser }) => {
     }
 
     getTeam();
-  }, [params.id, currentUser, token, navigate]);
+  }, [params.id, navigate, currentUser]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await PokeAPI.deleteTeam(params.id, token);
+
+      // alert(currentUser.token)
+      await PokeAPI.deleteTeam(params.id, currentUser.token);
       alert(`Successfully deleted team ${teamName}`);
       navigate('/');
     } catch (error) {

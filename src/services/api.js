@@ -24,8 +24,8 @@ class PokeAPI {
 
     // Do NOT log data
     console.debug("API Call:", endpoint, method);
-    // console.debug("Token: " + token)
-    const url = `${BASE_URL}/${endpoint}`;
+    console.debug("Token: " + token)
+    const url = `${BASE_URL}/${endpoint}`;  
     const headers = { Authorization: `Bearer ${token}` };
     const params = method === "get" ? data : {};
 
@@ -312,6 +312,7 @@ static async patchTeam(id, data, token) {
  */
 static async deleteTeam(id, token) {
   try {
+    // alert(token)
     const response = await this.request(`teams/${id}`, {}, 'delete', token);
     return response;
   } catch (error) {

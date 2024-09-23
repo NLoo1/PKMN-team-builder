@@ -1,56 +1,48 @@
-import React from "react";
-import "../styles/List.css";
+import React, { useState, useEffect, Fragment, useMemo } from "react";
+import { useParams, Link } from "react-router-dom";
 import { Card, CardBody, CardTitle } from "reactstrap";
 import PokeAPI from "../services/api";
-import { useState, useEffect, Fragment } from "react";
-import { useParams, Link } from "react-router-dom";
+import "../styles/List.css";
 
-/**
- * Team - Component for rendering a team. Displays team details, including Pokémon 
- * in the team, and allows for editing and deletion based on permissions.
- * 
- * @param {Object} props - The props for the component.
- * @param {string} props.token - Authentication token used for API requests.
- * @param {Function} props.editTeam - Function to handle team editing.
- * @param {Function} props.deleteTeam - Function to handle team deletion.
- * @param {Object} [props.currentUser] - The current user object, optional prop used 
- *                                       for permission checks.
- * 
- * @returns {JSX.Element} - Rendered Team component with team details and action buttons 
- *                           (edit and delete) based on user permissions.
- */
 export function Team({ token, editTeam, deleteTeam, currentUser }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [teamData, setTeamData] = useState([]);
-  const [teamName, setTeamName] = useState("New Team");
-  const params = useParams();
+  const [teamName, setTeamName] = useState({ team_name: "New Team", user_id: null });
   const [error, setError] = useState('');
+  const params = useParams();
 
   useEffect(() => {
     async function fetchTeamData() {
       try {
-        const resp = await PokeAPI.getAllPokemonInTeam(params.id);
-        const name = await PokeAPI.getTeamById(params.id);
+        const [resp, name] = await Promise.all([
+          PokeAPI.getAllPokemonInTeam(params.id),
+          PokeAPI.getTeamById(params.id),
+        ]);
         setTeamData(resp);
         setTeamName(name);
         setIsLoaded(true);
       } catch (err) {
         console.error("Error fetching team data:", err);
-        setError(err)
+        setError(err);
       }
     }
     fetchTeamData();
   }, [params.id]);
 
+  const canEditOrDelete = useMemo(() => {
+    return (
+      currentUser &&
+      (currentUser.isAdmin === "true" || (teamName.user_id && currentUser.user_id.toString() === teamName.user_id.toString()))
+    );
+  }, [currentUser, teamName]);
+
   return (
     <section className="content">
       {error && (
-  <div className="error-message">
-    {error.message || 'An unknown error occurred'}
-  </div>
-)}
-
-
+        <div className="error-message">
+          {error.message || "An unknown error occurred"}
+        </div>
+      )}
 
       {isLoaded && teamData.length > 0 ? (
         <section>
@@ -86,20 +78,16 @@ export function Team({ token, editTeam, deleteTeam, currentUser }) {
                 </tbody>
               </table>
 
-              {(currentUser && 
-  (currentUser.isAdmin === "true" || currentUser.user_id === teamName.user_id.toString())) && (
-  <Fragment>
-    <Link to={`/teams/${params.id}/delete`}>
-      <button className="btn btn-danger my-2">Delete team</button>
-    </Link>
-    <Link to={`/teams/${params.id}/edit`}>
-      <button className="btn btn-primary my-2 mx-1">
-        Edit team
-      </button>
-    </Link>
-  </Fragment>
-)}
-
+              {canEditOrDelete && (
+                <Fragment>
+                  <Link to={`/teams/${params.id}/delete`}>
+                    <button className="btn btn-danger my-2">Delete team</button>
+                  </Link>
+                  <Link to={`/teams/${params.id}/edit`}>
+                    <button className="btn btn-primary my-2 mx-1">Edit team</button>
+                  </Link>
+                </Fragment>
+              )}
             </CardBody>
           </Card>
         </section>
@@ -109,3 +97,4 @@ export function Team({ token, editTeam, deleteTeam, currentUser }) {
     </section>
   );
 }
+  

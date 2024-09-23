@@ -4,7 +4,7 @@ import PokeAPI from "../services/api";
 import { useState, useEffect } from "react";
 import { useLocation, useParams, Link } from "react-router-dom";
 
-export function Profile({ currentUser, token, editUser, deleteUser }) {
+export function Profile({ currentUser, editUser, deleteUser }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [userData, setUserData] = useState(null);
   const [userTeams, setUserTeams] = useState([]);
@@ -19,9 +19,9 @@ export function Profile({ currentUser, token, editUser, deleteUser }) {
         let resp;
   
         if (location.pathname.includes("/profile")) {
-          resp = await PokeAPI.getUser(currentUser.username, token);
+          resp = await PokeAPI.getUser(currentUser.username, currentUser.token);
         } else if (location.pathname.includes("/users")) {
-          resp = await PokeAPI.getUser(params.username, token);
+          resp = await PokeAPI.getUser(params.username, currentUser.token);
         }
   
         if (!resp || !resp.user) {
@@ -40,7 +40,7 @@ export function Profile({ currentUser, token, editUser, deleteUser }) {
     }
   
     getProfile();
-  }, [currentUser, location.pathname, params.username, token]);
+  }, [currentUser, location.pathname, params.username, currentUser.token]);
   
 
   return (

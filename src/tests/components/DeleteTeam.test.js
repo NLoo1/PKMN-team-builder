@@ -24,7 +24,7 @@ test('renders and handles deletion correctly', async () => {
   PokeAPI.getTeamById.mockResolvedValue(mockTeam);
   PokeAPI.deleteTeam.mockResolvedValue(); // Mock successful deletion
 
-  const currentUser = { user_id: '1', isAdmin: false };
+  const currentUser = { user_id: '1', isAdmin: false, token:'mock-token' };
   const token = 'mock-token';
   const teamId = '123';
 

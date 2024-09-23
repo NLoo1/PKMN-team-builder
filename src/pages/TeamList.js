@@ -149,6 +149,9 @@ export function MyTeamList({currentUser}) {
  * @requires token - user should be logged in
  */
 export function NewTeam({currentUser}) {
+
+  // console.log(currentUser.token)
+
   const [selectedPokemon, setSelectedPokemon] = useState(new Set());
   const [formData, setFormData] = useState({ teamName: "" });
   const [offset, setOffset] = useState(0);
@@ -216,7 +219,7 @@ export function NewTeam({currentUser}) {
     try {
 
       console.log(currentUser)
-      const user = await PokeAPI.getUser(currentUser.currentUser.username, currentUser.token);
+      const user = await PokeAPI.getUser(currentUser.currentUser.username, currentUser.currentUser.token);
   
       // Create team
       const team = await PokeAPI.createTeam(
@@ -224,7 +227,7 @@ export function NewTeam({currentUser}) {
           team_name: formData.teamName || "New Team",
           user_id: user.user.user_id,
         },
-        currentUser.token
+        currentUser.currentUser.token
       );
   
       const team_id = team.team.team_id;
@@ -255,7 +258,7 @@ export function NewTeam({currentUser}) {
           team_id,
           pokemon: pokemonToAdd,
         },
-        currentUser.token
+        currentUser.currentUser.token
       );
   
       alert("Team created successfully!");
